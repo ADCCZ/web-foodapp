@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Pokud požadovaný soubor nebo složka neexistuje...
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # ...přesměruj vše na index.php
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

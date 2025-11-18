@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # 1. Pokud je adresa prázdná (jen kořen webu), jdi do public
+    RewriteRule ^$ public/ [L]
+
+    # 2. Pokud adresa NEZAČÍNÁ na "public", přidej před ni "public/"
+    # (Tohle kouzlo ^((?!public/).*)$ zabrání té nekonečné smyčce)
+    RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
+</IfModule>
