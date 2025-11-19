@@ -1,0 +1,24 @@
+# Composer závislosti
+/vendor/
+
+# Twig cache
+/app/Views/cache/*
+!/app/Views/cache/.gitkeep
+
+# Nahrané soubory (obrázky produktů)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# IDE soubory
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS soubory
+.DS_Store
+Thumbs.db
+
+# Lokální konfigurace (pokud budete mít)
+config/local.php
+.env
