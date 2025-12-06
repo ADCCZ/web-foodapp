@@ -8,8 +8,8 @@ users (uživatelé)
   ├──> products (produkty dodavatelů)
   |      |
   |      └──> order_items (položky objednávek)
-  |              ^
-  |              |
+  |                          ^
+  |                          |
   └──> orders (objednávky) ──┘
 ```
 
