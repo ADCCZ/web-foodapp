@@ -11,7 +11,8 @@
       "Bash(database/install_new.sql)",
       "Bash(php fix_encoding.php:*)",
       "Bash(database/foodapp_export.sql)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

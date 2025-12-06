@@ -6,7 +6,7 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
-        <div class="card card-modern fade-in-up">
+        <div class="card card-modern">
             <div class="card-header text-center">
                 <div class="icon-wrapper mx-auto">
                     <i class="bi bi-person-plus-fill"></i>
@@ -62,23 +62,23 @@
                         <div class="row g-3">
                             <div class="col-6">
                                 <input type="radio" class="btn-check" name="role" id="role_konzument" value="konzument" checked>
-                                <label class="btn btn-outline-primary w-100" for="role_konzument">
-                                    <i class="bi bi-person-fill d-block fs-3 mb-2"></i>
+                                <label class="btn w-100" for="role_konzument" style="border: 2px solid #f97316; color: #0f172a; border-radius: 8px; padding: 1rem;">
+                                    <i class="bi bi-person-fill d-block fs-3 mb-2" style="color: #f97316;"></i>
                                     <strong>Zákazník</strong><br>
                                     <small>Chci objednávat</small>
                                 </label>
                             </div>
                             <div class="col-6">
                                 <input type="radio" class="btn-check" name="role" id="role_dodavatel" value="dodavatel">
-                                <label class="btn btn-outline-primary w-100" for="role_dodavatel">
-                                    <i class="bi bi-shop d-block fs-3 mb-2"></i>
+                                <label class="btn w-100" for="role_dodavatel" style="border: 2px solid #1e40af; color: #0f172a; border-radius: 8px; padding: 1rem;">
+                                    <i class="bi bi-shop d-block fs-3 mb-2" style="color: #1e40af;"></i>
                                     <strong>Dodavatel</strong><br>
                                     <small>Chci prodávat</small>
                                 </label>
                             </div>
                         </div>
-                        <small class="text-muted d-block mt-2">
-                            <i class="bi bi-info-circle"></i> Účet dodavatele musí být schválen administrátorem
+                        <small style="color: #64748b;" class="d-block mt-2">
+                            <i class="bi bi-info-circle" style="color: #f97316;"></i> Účet dodavatele musí být schválen administrátorem
                         </small>
                     </div>
 

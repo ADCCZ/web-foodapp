@@ -52,6 +52,12 @@ switch ($page) {
          $controller->logout();
          break;
 
+    case 'products':
+        require_once '../app/Controllers/ProductController.php';
+        $controller = new ProductController();
+        $controller->index();
+        break;
+
     default:
         echo "<h1>404 - Stránka nenalezena</h1>";
         break;

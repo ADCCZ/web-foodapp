@@ -5,21 +5,21 @@
 
 {% block content %}
 <div class="row justify-content-center text-center">
-    <div class="col-lg-8">
+    <div class="col-lg-10">
         {# Hero Section #}
-        <div class="hero-section fade-in-up">
+        <div class="hero-section">
             <div class="icon-wrapper mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2.5rem;">
                 <i class="bi bi-cup-hot-fill"></i>
             </div>
-            <h1 class="display-3 fw-bold text-white mb-3" style="text-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-                Vítejte v <span style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Délicious</span>
+            <h1 class="display-3 fw-bold mb-3" style="color: #0f172a;">
+                Vítejte v <span style="color: #f97316;">Délicious</span>
             </h1>
-            <p class="lead text-white mb-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.2); font-size: 1.3rem;">
+            <p class="lead mb-4" style="color: #64748b; font-size: 1.3rem;">
                 Rozvoz vašeho oblíbeného jídla rychle a pohodlně
             </p>
 
             {# Call to Action Buttons #}
-            <div class="d-flex gap-3 justify-content-center mb-5">
+            <div class="d-flex gap-3 justify-content-center">
                 {% if session.user_id is defined %}
                     {# Uživatel je přihlášený #}
                     <a href="?page=products" class="btn btn-modern btn-modern-primary btn-lg px-5 py-3">
@@ -28,48 +28,42 @@
                 {% else %}
                     {# Uživatel není přihlášený #}
                     <a href="?page=login" class="btn btn-modern btn-modern-primary btn-lg px-5 py-3">
-                        <i class="bi bi-box-arrow-in-right me-2"></i> Přihlásit se
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Přihlásit se
                     </a>
-                    <a href="?page=register" class="btn btn-modern bg-white text-dark btn-lg px-5 py-3" style="border-radius: 12px; font-weight: 600;">
-                        <i class="bi bi-person-plus-fill me-2"></i> Registrovat
+                    <a href="?page=register" class="btn btn-modern btn-modern-secondary btn-lg px-5 py-3">
+                        <i class="bi bi-person-plus-fill me-2"></i>Registrovat
                     </a>
                 {% endif %}
             </div>
         </div>
 
         {# Features #}
-        <div class="row g-4 mt-5">
+        <div class="row g-4 mt-4">
             <div class="col-md-4">
-                <div class="card card-modern glass-effect h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-wrapper mx-auto mb-3" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                        </div>
-                        <h5 class="text-white fw-bold mb-2">Rychlé doručení</h5>
-                        <p class="text-white mb-0">Vaše jídlo doručíme za méně než 30 minut</p>
+                <div class="feature-card text-center">
+                    <div class="icon-wrapper mx-auto" style="background: #f97316; color: white; font-size: 2rem;">
+                        <i class="bi bi-lightning-charge-fill"></i>
                     </div>
+                    <h5 class="fw-bold mb-2" style="color: #0f172a;">Rychlé doručení</h5>
+                    <p class="mb-0" style="color: #64748b;">Vaše jídlo doručíme za méně než 30 minut</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card card-modern glass-effect h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-wrapper mx-auto mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <i class="bi bi-star-fill"></i>
-                        </div>
-                        <h5 class="text-white fw-bold mb-2">Kvalitní jídlo</h5>
-                        <p class="text-white mb-0">Spolupracujeme jen s ověřenými restauracemi</p>
+                <div class="feature-card text-center">
+                    <div class="icon-wrapper mx-auto" style="background: #1e40af; color: white; font-size: 2rem;">
+                        <i class="bi bi-star-fill"></i>
                     </div>
+                    <h5 class="fw-bold mb-2" style="color: #0f172a;">Kvalitní jídlo</h5>
+                    <p class="mb-0" style="color: #64748b;">Spolupracujeme jen s ověřenými restauracemi</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card card-modern glass-effect h-100">
-                    <div class="card-body text-center p-4">
-                        <div class="icon-wrapper mx-auto mb-3" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <i class="bi bi-shield-check-fill"></i>
-                        </div>
-                        <h5 class="text-white fw-bold mb-2">Bezpečná platba</h5>
-                        <p class="text-white mb-0">Vaše platební údaje jsou v bezpečí</p>
+                <div class="feature-card text-center">
+                    <div class="icon-wrapper mx-auto" style="background: #ef4444; color: #ffffff; font-size: 2rem; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-credit-card-fill"></i>
                     </div>
+                    <h5 class="fw-bold mb-2" style="color: #0f172a;">Bezpečná platba</h5>
+                    <p class="mb-0" style="color: #64748b;">Vaše platební údaje jsou v bezpečí</p>
                 </div>
             </div>
         </div>
@@ -78,52 +72,52 @@
         {% if session.user_id is not defined %}
         <div class="card card-modern mt-5">
             <div class="card-body p-5">
-                <h3 class="fw-bold mb-4">
-                    <i class="bi bi-question-circle-fill me-2" style="color: #667eea;"></i>
+                <h3 class="fw-bold mb-4" style="color: #0f172a;">
+                    <i class="bi bi-question-circle-fill me-2" style="color: #f97316;"></i>
                     Jak to funguje?
                 </h3>
-                <div class="row g-3 text-start">
+                <div class="row g-4 text-start">
                     <div class="col-md-3">
                         <div class="d-flex align-items-start">
-                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem; background: #f97316;">
                                 <i class="bi bi-1-circle-fill"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-1">Zaregistrujte se</h6>
-                                <small class="text-muted">Vytvořte si účet zdarma</small>
+                                <h6 class="fw-bold mb-1" style="color: #0f172a;">Zaregistrujte se</h6>
+                                <small style="color: #64748b;">Vytvořte si účet zdarma</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="d-flex align-items-start">
-                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem; background: #1e40af;">
                                 <i class="bi bi-2-circle-fill"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-1">Vyberte jídlo</h6>
-                                <small class="text-muted">Prohlédněte si nabídku</small>
+                                <h6 class="fw-bold mb-1" style="color: #0f172a;">Vyberte jídlo</h6>
+                                <small style="color: #64748b;">Prohlédněte si nabídku</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="d-flex align-items-start">
-                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem; background: #ef4444;">
                                 <i class="bi bi-3-circle-fill"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-1">Objednejte</h6>
-                                <small class="text-muted">Potvrďte objednávku</small>
+                                <h6 class="fw-bold mb-1" style="color: #0f172a;">Objednejte</h6>
+                                <small style="color: #64748b;">Potvrďte objednávku</small>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="d-flex align-items-start">
-                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <div class="icon-wrapper me-3" style="width: 40px; height: 40px; font-size: 1.2rem; background: #22c55e;">
                                 <i class="bi bi-4-circle-fill"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bold mb-1">Vychutnávejte</h6>
-                                <small class="text-muted">Jídlo u vás do 30 min</small>
+                                <h6 class="fw-bold mb-1" style="color: #0f172a;">Vychutnávejte</h6>
+                                <small style="color: #64748b;">Jídlo u vás do 30 min</small>
                             </div>
                         </div>
                     </div>
@@ -133,18 +127,4 @@
         {% endif %}
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.hero-section {
-    padding: 3rem 0;
-}
-
-@media (max-width: 768px) {
-    .hero-section h1 {
-        font-size: 2.5rem;
-    }
-}
-</style>
 {% endblock %}

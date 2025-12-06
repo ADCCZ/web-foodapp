@@ -127,26 +127,31 @@ case 'newpage':
 
 ## Design System
 
-**Modern Gradient UI:**
-- Purple-to-blue gradient background (`linear-gradient(135deg, #667eea 0%, #764ba2 100%)`)
-- Glass effect cards with backdrop blur
+**Modern Minimalist UI:**
+- Clean light background (`#f8fafc`)
+- Contrasting colors without gradients
 - Bootstrap Icons throughout
-- Smooth animations (fade-in-up, pulse, hover effects)
+- Simple hover effects (no complex animations)
 - Modern form inputs with icons
-- Gradient buttons with hover effects
+- Clean card design with subtle shadows
 - Responsive layout (mobile + desktop)
 
 **CSS Variables:**
 ```css
---primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
---success-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
---food-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+--primary-dark: #0f172a;
+--primary-blue: #1e40af;
+--accent-orange: #f97316;
+--accent-red: #ef4444;
+--bg-light: #f8fafc;
+--bg-gray: #f1f5f9;
+--text-dark: #1e293b;
+--text-gray: #64748b;
 ```
 
 ## Current Implementation Status
 
 **✅ Implemented:**
-- Modern gradient UI design with Twig templates
+- Modern minimalist UI design with Twig templates
 - HomeController with hero section and features
 - Login/logout with AJAX and session management
 - Registration with role selection (customer/supplier)
@@ -154,15 +159,29 @@ case 'newpage':
 - Password hashing (bcrypt)
 - SQL injection protection (PDO prepared statements)
 - Responsive navbar with Bootstrap Icons
-- Glass effect cards and modern forms
+- Clean card design with contrasting colors
+- Bootstrap 5 integration (mostly used)
+- Twig template engine (used in various places)
+- AJAX for login/register (used in places)
+- Composer for dependency management
+- Database schema with 4 tables (users, products, orders, order_items)
+- Git repository
+
+**Current Points Estimate:**
+- Mandatory: ~18-20 points (missing full responsive mobile, complete design)
+- Optional: ~11 points (Bootstrap 4, Twig 4, AJAX 1, Composer 1, Git 1)
+- Total: ~29-31 points (before full implementation)
 
 **⏳ In Progress / Planned:**
-- Product management (CRUD)
+- Product management (CRUD with image upload)
 - Shopping cart (AJAX-based)
 - Order processing
 - Admin panel for user/supplier approval
-- File upload for product images
+- File upload for product images (with unique filenames)
 - Middleware for route protection
+- Mobile responsive testing and fixes
+- More AJAX functionality
+- Code comments and documentation
 
 ## Code Style Guidelines
 
@@ -172,7 +191,60 @@ case 'newpage':
 - Keep code comments concise and technical
 - Documentation should be clean and professional
 
-## Academic Requirements
+## Academic Requirements & Grading
+
+### Grading System
+
+**Mandatory Requirements (max 25 points):**
+- MVC architecture (OOP min. M and C): 1 point
+- Fewer errors: 1 point
+- Properly separated layers: 5 points
+- Responsive design (PC): 3 points
+- Responsive design (mobile, no bugs): 5 points
+- Website quality (usable, fully functional): 6 points
+- Design quality:
+  - Normal design: 2 points
+  - Nice design: 5 points
+  - Advanced design: 7 points
+- Password hashing (Bcrypt, Argon2): 1 point
+- Attack protection (SQL Injection, XSS): 1 point
+
+**Optional Extensions (max 34 points + 10 bonus):**
+- Presentation and submission "before Christmas" (bonus): 10 points
+- SuperAdmin ("admin immutability"): 4 (2) points
+- Use of namespaces: 1 point
+- Unique filenames after upload: 2 points
+- Additional features: 1 point
+- Bootstrap or equivalent:
+  - Partially used: 2 points
+  - Mostly used: 4 points
+- JavaScript/jQuery/Angular:
+  - Used in places: 1 point
+  - Used in various places: 2 points
+- AJAX:
+  - Used in places: 1 point
+  - Used in various places: 2 points
+- Twig:
+  - Used in places: 2 points
+  - Used in various places: 4 points
+- Custom REST API:
+  - Parts (e.g., one URL and POST for everything): 2 points
+  - Complete FullREST endpoint: 4 points
+- Custom SSE (+API): 1-2 points
+- WYSIWYG editor (e.g., CKEditor): 3-4 points
+- NPM, Composer or equivalent: 1 point
+- Docker or equivalent (installs NPM and Composer, runs database environment): 2-3 points
+- Source code on GIT (gitlab, github): 1 point
+
+**Penalties:**
+- Invalid HTML (deduced invalidity is allowed, e.g., when using frameworks): 10 points
+- Errors or warnings in PHP: 5-10 points
+- Database has fewer than 3 tables: 10 points
+- Missing file upload: 4 points
+- Too simple SP assignment: up to 7 points
+- Messy code, missing comments: up to 5 points
+
+### Project Requirements
 
 This project must meet specific semester requirements:
 - Minimum 3 user roles with role-based access control

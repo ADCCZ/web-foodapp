@@ -20,45 +20,65 @@
 </head>
 <body>
 
-    {# Navigační lišta - zobrazí se když je uživatel přihlášený #}
-    {% if session.user_id is defined %}
+    {# Navigační lišta - vždy viditelná #}
     <nav class="navbar navbar-expand-lg navbar-modern sticky-top">
         <div class="container">
             <a class="navbar-brand" href="?page=home">
-                <i class="bi bi-cup-hot-fill"></i> Délicious
+                <i class="bi bi-cup-hot-fill" style="color: #f97316;"></i> <span style="color: #0f172a;">Délicious</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <span class="navbar-text me-3">
-                            <i class="bi bi-person-circle"></i> <strong>{{ session.jmeno }}</strong>
-                            <span class="badge bg-primary">{{ session.role }}</span>
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="?page=logout">
-                            <i class="bi bi-box-arrow-right"></i> Odhlásit se
+                        <a class="nav-link" href="?page=products">
+                            <i class="bi bi-basket-fill"></i> Nabídka
                         </a>
                     </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if session.user_id is defined %}
+                        {# Přihlášený uživatel #}
+                        <li class="nav-item">
+                            <span class="navbar-text me-3" style="color: #1e293b;">
+                                <i class="bi bi-person-circle" style="color: #f97316;"></i> <strong>{{ session.jmeno }}</strong>
+                                <span class="badge" style="background: #f97316;">{{ session.role }}</span>
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="?page=logout">
+                                <i class="bi bi-box-arrow-right"></i> Odhlásit se
+                            </a>
+                        </li>
+                    {% else %}
+                        {# Nepřihlášený uživatel #}
+                        <li class="nav-item">
+                            <a class="nav-link" href="?page=login">
+                                <i class="bi bi-box-arrow-in-right"></i> Přihlásit se
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-modern btn-modern-primary px-3 py-2 ms-2" href="?page=register">
+                                <i class="bi bi-person-plus-fill"></i> Registrovat
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
-    {% endif %}
 
     {# Hlavní obsah stránky - každá šablona si ho naplní po svém #}
-    <main class="container-modern fade-in-up">
+    <main class="container-modern">
         {% block content %}{% endblock %}
     </main>
 
     {# Footer #}
     <footer class="text-center py-4 mt-5">
         <div class="container">
-            <p class="text-white mb-0" style="text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                <i class="bi bi-heart-fill text-danger"></i> Délicious &copy; 2024
+            <p class="mb-0" style="color: #64748b;">
+                <i class="bi bi-heart-fill" style="color: #f97316;"></i> Délicious &copy; 2025
             </p>
         </div>
     </footer>
