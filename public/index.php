@@ -19,8 +19,9 @@ $page = $_GET['page'] ?? 'home';
 // Přepínač stránek
 switch ($page) {
     case 'home':
-        // Zatím jen placeholder, později tu bude HomeController
-        echo "<h1>Vítejte v rozvozu jídla!</h1><a href='?page=login'>Přihlásit se</a>";
+        require_once '../app/Controllers/HomeController.php';
+        $controller = new HomeController();
+        $controller->index();
         break;
 
     case 'login':

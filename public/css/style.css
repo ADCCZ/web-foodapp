@@ -1,0 +1,259 @@
+/* Food App - Modern Styling */
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --food-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --dark-bg: #1a1a2e;
+    --card-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    --card-shadow-hover: 0 15px 50px rgba(0,0,0,0.15);
+}
+
+/* Gradient Background */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Modern Navbar */
+.navbar-modern {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+}
+
+.navbar-modern .navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.navbar-modern .nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin: 0 0.5rem;
+}
+
+.navbar-modern .nav-link:hover {
+    color: #667eea !important;
+    transform: translateY(-2px);
+}
+
+/* Modern Cards */
+.card-modern {
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card-modern:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-5px);
+}
+
+.card-modern .card-header {
+    background: var(--primary-gradient);
+    border: none;
+    padding: 1.5rem;
+    border-radius: 20px 20px 0 0 !important;
+}
+
+.card-modern .card-header h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.card-modern .card-body {
+    padding: 2rem;
+}
+
+.card-modern .card-footer {
+    background: rgba(0,0,0,0.02);
+    border: none;
+    padding: 1rem 2rem;
+}
+
+/* Modern Form Inputs */
+.form-control-modern {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.form-control-modern:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    background: white;
+    transform: translateY(-2px);
+}
+
+.form-label-modern {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Modern Buttons */
+.btn-modern {
+    border-radius: 12px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern-primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.btn-modern-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transition: all 0.4s ease;
+}
+
+.btn-modern:hover::before {
+    left: 100%;
+}
+
+/* Alert Messages */
+.alert-modern {
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.alert-modern.alert-danger {
+    background: rgba(248, 215, 218, 0.9);
+    color: #721c24;
+}
+
+.alert-modern.alert-success {
+    background: rgba(212, 237, 218, 0.9);
+    color: #155724;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+/* Loading Spinner */
+.spinner-modern {
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top: 3px solid white;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Icons */
+.icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-gradient);
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Links */
+a {
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .card-modern .card-body {
+        padding: 1.5rem;
+    }
+
+    .navbar-modern .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+/* Glass Effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Container Spacing */
+.container-modern {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}

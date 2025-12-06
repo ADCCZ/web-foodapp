@@ -1,0 +1,166 @@
+{# app/Views/templates/register.twig #}
+{% extends "base.twig" %}
+
+{% block title %}Registrace - Délicious{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card card-modern fade-in-up">
+            <div class="card-header text-center">
+                <div class="icon-wrapper mx-auto">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+                <h4 class="text-white mb-0">Vytvořit nový účet</h4>
+            </div>
+            <div class="card-body">
+
+                {# Alert box pro zprávy #}
+                <div id="alertBox" class="alert alert-modern alert-danger d-none" role="alert">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    <span id="alertMessage"></span>
+                </div>
+
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="jmeno" class="form-label form-label-modern">
+                            <i class="bi bi-person-fill me-1"></i> Jméno a příjmení
+                        </label>
+                        <input type="text" class="form-control form-control-modern" id="jmeno" name="jmeno" required
+                               placeholder="Jan Novák">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label form-label-modern">
+                            <i class="bi bi-envelope-fill me-1"></i> Emailová adresa
+                        </label>
+                        <input type="email" class="form-control form-control-modern" id="email" name="email" required
+                               placeholder="vas@email.cz">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label form-label-modern">
+                            <i class="bi bi-key-fill me-1"></i> Heslo
+                        </label>
+                        <input type="password" class="form-control form-control-modern" id="password" name="password" required
+                               placeholder="••••••••" minlength="6">
+                        <small class="text-muted">Minimálně 6 znaků</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password_confirm" class="form-label form-label-modern">
+                            <i class="bi bi-key-fill me-1"></i> Potvrzení hesla
+                        </label>
+                        <input type="password" class="form-control form-control-modern" id="password_confirm" name="password_confirm" required
+                               placeholder="••••••••">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label form-label-modern">
+                            <i class="bi bi-briefcase-fill me-1"></i> Typ účtu
+                        </label>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="role" id="role_konzument" value="konzument" checked>
+                                <label class="btn btn-outline-primary w-100" for="role_konzument">
+                                    <i class="bi bi-person-fill d-block fs-3 mb-2"></i>
+                                    <strong>Zákazník</strong><br>
+                                    <small>Chci objednávat</small>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="role" id="role_dodavatel" value="dodavatel">
+                                <label class="btn btn-outline-primary w-100" for="role_dodavatel">
+                                    <i class="bi bi-shop d-block fs-3 mb-2"></i>
+                                    <strong>Dodavatel</strong><br>
+                                    <small>Chci prodávat</small>
+                                </label>
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            <i class="bi bi-info-circle"></i> Účet dodavatele musí být schválen administrátorem
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-modern btn-modern-primary w-100 py-3">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span id="btnText">Zaregistrovat se</span>
+                    </button>
+                </form>
+
+            </div>
+            <div class="card-footer text-center">
+                <small class="text-muted">
+                    Už máte účet? <a href="?page=login" class="fw-bold">
+                        <i class="bi bi-box-arrow-in-right"></i> Přihlaste se
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const alertBox = document.getElementById('alertBox');
+    const alertMessage = document.getElementById('alertMessage');
+    const btn = this.querySelector('button[type="submit"]');
+    const btnText = document.getElementById('btnText');
+
+    // Basic validation
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password_confirm').value;
+
+    if (password !== passwordConfirm) {
+        alertMessage.textContent = 'Hesla se neshodují!';
+        alertBox.classList.remove('d-none');
+        return;
+    }
+
+    // Disable button and show loading
+    btn.disabled = true;
+    btnText.innerHTML = 'Registruji<span class="spinner-modern"></span>';
+    alertBox.classList.add('d-none');
+
+    fetch('?page=register', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Success - show success message
+            alertBox.classList.remove('alert-danger');
+            alertBox.classList.add('alert-success');
+            alertMessage.textContent = data.message;
+            alertBox.classList.remove('d-none');
+
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+                window.location.href = '?page=login';
+            }, 2000);
+        } else {
+            // Error - show error message
+            alertMessage.textContent = data.message;
+            alertBox.classList.remove('alert-success');
+            alertBox.classList.add('alert-danger');
+            alertBox.classList.remove('d-none');
+            btn.disabled = false;
+            btnText.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Zaregistrovat se';
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alertMessage.textContent = "Chyba komunikace se serverem. Zkontrolujte konzoli (F12).";
+        alertBox.classList.remove('d-none');
+        btn.disabled = false;
+        btnText.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Zaregistrovat se';
+    });
+});
+</script>
+{% endblock %}

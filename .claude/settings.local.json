@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(composer --version:*)",
+      "Bash(composer install:*)",
+      "Bash(php -r:*)",
+      "Bash(mysql:*)",
+      "Bash(mysqldump:*)",
+      "Bash(database/install_new.sql)",
+      "Bash(php fix_encoding.php:*)",
+      "Bash(database/foodapp_export.sql)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

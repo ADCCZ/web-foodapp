@@ -1,10 +1,10 @@
-# Food App - Objednávkový systém rozvozu jídla
+# Délicious - Objednávkový systém rozvozu jídla
 
-Webová aplikace pro objednávání a rozvoz jídla. Semestrální projekt z předmětu Webové aplikace.
+Moderní webová aplikace pro objednávání a rozvoz jídla s elegantním designem. Semestrální projekt z předmětu Webové aplikace.
 
 ## O projektu
 
-Systém pro rozvoz potravin s více uživatelskými rolemi:
+**Délicious** je systém pro rozvoz potravin s více uživatelskými rolemi:
 - **Nepřihlášení uživatelé** - prohlížení produktů, registrace
 - **Konzumenti (zákazníci)** - objednávání produktů, správa košíku, historie objednávek
 - **Dodavatelé** - správa produktů, vyřizování objednávek, statistiky
@@ -19,26 +19,36 @@ Systém pro rozvoz potravin s více uživatelskými rolemi:
 - **Dependency Management:** Composer
 - **Webserver:** Apache (XAMPP)
 
+## Funkce
+
+- **Moderní gradient design** - Fialovo-modré gradientní pozadí, glass effect
+- **Responzivní rozhraní** - Bootstrap 5 + vlastní CSS
+- **Bezpečné přihlášení** - Bcrypt hashování, SQL injection ochrana
+- **Košík a objednávky** - AJAX-based nákupní košík
+- **Správa produktů** - Upload obrázků, CRUD operace
+- **Role-based přístup** - Konzumenti, Dodavatelé, Administrátoři
+- **AJAX formuláře** - Bez reload stránky
+
 ## Struktura projektu
 
 ```
 web-foodapp/
 ├── app/
-│   ├── Controllers/        # Controllery (MVC)
-│   ├── Models/            # Modelové třídy (databáze)
+│   ├── Controllers/        # Controllery (HomeController, LoginController...)
+│   ├── Models/            # Modelové třídy (Database.php)
 │   ├── Views/
-│   │   ├── templates/     # Twig šablony (.twig)
+│   │   ├── templates/     # Twig šablony (home.twig, login.twig, register.twig)
 │   │   └── cache/         # Twig cache (auto-generovaný)
-│   ├── Helpers/           # Pomocné třídy (TwigHelper, validace...)
-│   └── Middleware/        # Middleware (autentizace, autorizace)
-├── config/                # Konfigurační soubory
+│   ├── Helpers/           # Pomocné třídy (TwigHelper)
+│   └── Middleware/        # Middleware (připraveno)
 ├── public/
 │   ├── index.php          # Vstupní bod aplikace (router)
-│   ├── css/               # Vlastní styly
+│   ├── css/
+│   │   └── style.css      # Moderní vlastní CSS (gradienty, animace)
 │   ├── js/                # JavaScriptové soubory
 │   └── uploads/           # Nahrané soubory (obrázky produktů)
-├── vendor/                # Composer závislosti
-├── database/              # SQL soubory (instalace, migrace)
+├── vendor/                # Composer závislosti (Twig)
+├── database/              # SQL soubory (install.sql, schema.md)
 ├── .htaccess             # URL rewriting
 ├── composer.json         # Composer konfigurace
 └── README.md             # Tento soubor
@@ -136,6 +146,8 @@ Otevřete prohlížeč a přejděte na:
 http://localhost/web-foodapp/
 ```
 
+Měli byste vidět moderní home page aplikace **Délicious** s fialovým gradientním pozadím a možností přihlášení/registrace.
+
 ---
 
 ## Výchozí uživatelské účty
@@ -168,18 +180,18 @@ error_reporting(E_ALL);
 
 ### Práce s Twig šablonami
 
-- Šablony jsou v `app/Views/templates/`
-- Po změně šablony se automaticky překompilují (díky `auto_reload: true`)
-- V produkci nastavte `auto_reload: false` pro lepší výkon
+Šablony jsou v `app/Views/templates/` a používají template engine Twig 3.
 
-Příklad použití v Controlleru:
+**Vytvoření nové stránky:**
 
+1. **Vytvořte Controller:**
 ```php
+<?php
 require_once '../app/Helpers/TwigHelper.php';
 
 class ProductController {
     public function index() {
-        $produkty = ...; // Načtení z databáze
+        $produkty = []; // Načtení z databáze
 
         TwigHelper::display('produkty/seznam.twig', [
             'session' => $_SESSION,
@@ -189,6 +201,41 @@ class ProductController {
     }
 }
 ```
+
+2. **Vytvořte Twig šablonu** (`app/Views/templates/produkty/seznam.twig`):
+```twig
+{% extends "base.twig" %}
+
+{% block title %}{{ nazev }}{% endblock %}
+
+{% block content %}
+    <h1>{{ nazev }}</h1>
+
+    {% for produkt in produkty %}
+        <div class="card card-modern">
+            <h3>{{ produkt.name }}</h3>
+            <p>{{ produkt.description }}</p>
+            <strong>{{ produkt.price }} Kč</strong>
+        </div>
+    {% endfor %}
+{% endblock %}
+```
+
+**Užitečné Twig konstrukce:**
+```twig
+{# Komentář #}
+{{ promenna }}                          {# Výpis proměnné (auto-escaped) #}
+{{ promenna|upper }}                     {# Filtry (UPPERCASE) #}
+{% if session.user_id is defined %}     {# Podmínka #}
+{% for item in items %}                 {# Cyklus #}
+{% include 'components/header.twig' %}  {# Include #}
+```
+
+**Výhody Twigu:**
+- Automatické escapování XSS
+- Čistší syntax než PHP
+- Dědičnost šablon (extends)
+- Cache pro rychlost
 
 ### Přidání nové stránky
 
@@ -284,9 +331,20 @@ rm -rf app/Views/cache/*
 ## Licence a autor
 
 **Projekt:** Semestrální práce - Webové aplikace
+**Název aplikace:** Délicious
 **Autor:** [Vaše jméno]
 **Email:** [váš email]
 **Rok:** 2024/2025
+
+## Design
+
+Aplikace využívá moderní design s:
+- Gradient pozadí (fialovo-modré)
+- Bootstrap Icons
+- Glass effect karty
+- Smooth animace (fade-in, hover efekty)
+- Moderní formuláře s ikonami
+- Responzivní layout
 
 ---
 

@@ -4,33 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Food App{% endblock %}</title>
+    <title>{% block title %}Délicious - Rozvoz jídla{% endblock %}</title>
 
     {# Bootstrap 5 CSS #}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    {# Bootstrap Icons #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    {# Vlastní moderní CSS #}
+    <link href="css/style.css" rel="stylesheet">
+
     {# Vlastní CSS #}
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-light">
+<body>
 
     {# Navigační lišta - zobrazí se když je uživatel přihlášený #}
     {% if session.user_id is defined %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-modern sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="?page=home">🍕 Food App</a>
+            <a class="navbar-brand" href="?page=home">
+                <i class="bi bi-cup-hot-fill"></i> Délicious
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <span class="navbar-text text-white me-3">
-                            Přihlášen: <strong>{{ session.jmeno }}</strong> ({{ session.role }})
+                        <span class="navbar-text me-3">
+                            <i class="bi bi-person-circle"></i> <strong>{{ session.jmeno }}</strong>
+                            <span class="badge bg-primary">{{ session.role }}</span>
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="?page=logout">Odhlásit se</a>
+                        <a class="nav-link" href="?page=logout">
+                            <i class="bi bi-box-arrow-right"></i> Odhlásit se
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -39,9 +50,18 @@
     {% endif %}
 
     {# Hlavní obsah stránky - každá šablona si ho naplní po svém #}
-    <main class="container mt-5">
+    <main class="container-modern fade-in-up">
         {% block content %}{% endblock %}
     </main>
+
+    {# Footer #}
+    <footer class="text-center py-4 mt-5">
+        <div class="container">
+            <p class="text-white mb-0" style="text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                <i class="bi bi-heart-fill text-danger"></i> Délicious &copy; 2024
+            </p>
+        </div>
+    </footer>
 
     {# Bootstrap JS #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
