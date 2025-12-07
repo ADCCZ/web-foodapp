@@ -1,0 +1,198 @@
+{# app/Views/templates/admin_users.twig #}
+{% extends "base.twig" %}
+
+{% block title %}Správa uživatelů - Délicious{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="?page=admin" class="btn btn-modern btn-modern-secondary btn-sm mb-3">
+            <i class="bi bi-arrow-left"></i> Zpět na dashboard
+        </a>
+
+        <h2 class="fw-bold" style="color: #0f172a;">
+            <i class="bi bi-people-fill" style="color: #f97316;"></i> Správa uživatelů
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Jméno</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Stav</th>
+                                <th>Registrace</th>
+                                <th>Akce</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr id="user-{{ user.user_id }}">
+                                <td>{{ user.user_id }}</td>
+                                <td><strong>{{ user.jmeno }}</strong></td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <select class="form-select form-select-sm" onchange="updateRole({{ user.user_id }}, this.value)" {% if user.user_id == session.user_id %}disabled{% endif %}>
+                                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                        <option value="dodavatel" {% if user.role == 'dodavatel' %}selected{% endif %}>Dodavatel</option>
+                                        <option value="konzument" {% if user.role == 'konzument' %}selected{% endif %}>Konzument</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    {% if user.role == 'dodavatel' %}
+                                        {% if user.is_approved == 1 %}
+                                            <span class="badge bg-success">Schváleno</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Čeká na schválení</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at }}</td>
+                                <td>
+                                    {% if user.role == 'dodavatel' %}
+                                        {% if user.is_approved == 0 %}
+                                            <button class="btn btn-success btn-sm" onclick="approveSupplier({{ user.user_id }})">
+                                                <i class="bi bi-check-circle-fill"></i>
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-warning btn-sm" onclick="rejectSupplier({{ user.user_id }})">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if user.user_id != session.user_id %}
+                                        <button class="btn btn-danger btn-sm" onclick="deleteUser({{ user.user_id }})">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateRole(userId, newRole) {
+    if (!confirm('Opravdu chcete změnit roli tohoto uživatele?')) {
+        location.reload();
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('user_id', userId);
+    formData.append('role', newRole);
+
+    fetch('?page=admin&action=update-role', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(data.message);
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při změně role');
+        location.reload();
+    });
+}
+
+function approveSupplier(userId) {
+    if (!confirm('Schválit tohoto dodavatele?')) return;
+
+    const formData = new FormData();
+    formData.append('user_id', userId);
+
+    fetch('?page=admin&action=approve', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při schvalování');
+    });
+}
+
+function rejectSupplier(userId) {
+    if (!confirm('Zrušit schválení tohoto dodavatele?')) return;
+
+    const formData = new FormData();
+    formData.append('user_id', userId);
+
+    fetch('?page=admin&action=reject', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při zamítání');
+    });
+}
+
+function deleteUser(userId) {
+    if (!confirm('OPRAVDU chcete smazat tohoto uživatele? Tato akce je nevratná!')) return;
+
+    const formData = new FormData();
+    formData.append('user_id', userId);
+
+    fetch('?page=admin&action=delete-user', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('user-' + userId).remove();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při mazání uživatele');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,188 @@
+{# app/Views/templates/admin_dashboard.twig #}
+{% extends "base.twig" %}
+
+{% block title %}Administrace - Délicious{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold" style="color: #0f172a;">
+            <i class="bi bi-speedometer2" style="color: #f97316;"></i> Admin Dashboard
+        </h2>
+    </div>
+</div>
+
+{# Statistics Cards #}
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <i class="bi bi-people-fill" style="font-size: 2.5rem; color: #f97316;"></i>
+                <h3 class="mt-3 mb-0">{{ stats.total_users }}</h3>
+                <p class="text-muted mb-0">Celkem uživatelů</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <i class="bi bi-cart-fill" style="font-size: 2.5rem; color: #3b82f6;"></i>
+                <h3 class="mt-3 mb-0">{{ stats.total_customers }}</h3>
+                <p class="text-muted mb-0">Zákazníků</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <i class="bi bi-shop-window" style="font-size: 2.5rem; color: #10b981;"></i>
+                <h3 class="mt-3 mb-0">{{ stats.approved_suppliers }}</h3>
+                <p class="text-muted mb-0">Schválení dodavatelé</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card card-modern text-center">
+            <div class="card-body">
+                <i class="bi bi-clock-fill" style="font-size: 2.5rem; color: #eab308;"></i>
+                <h3 class="mt-3 mb-0">{{ stats.pending_suppliers }}</h3>
+                <p class="text-muted mb-0">Čeká na schválení</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Quick Actions #}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Rychlé akce</h5>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="?page=admin&action=users" class="btn btn-modern btn-modern-primary">
+                        <i class="bi bi-people-fill"></i> Správa uživatelů
+                    </a>
+                    <a href="?page=admin&action=orders" class="btn btn-modern btn-modern-secondary">
+                        <i class="bi bi-bag-check-fill"></i> Všechny objednávky
+                    </a>
+                    <a href="?page=admin&action=products" class="btn btn-modern btn-modern-secondary">
+                        <i class="bi bi-box-seam"></i> Všechny produkty
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Pending Suppliers #}
+{% if pendingSuppliers|length > 0 %}
+<div class="row">
+    <div class="col-12">
+        <div class="card card-modern">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">
+                    <i class="bi bi-clock-fill" style="color: #eab308;"></i> Dodavatelé čekající na schválení
+                </h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Jméno</th>
+                                <th>Email</th>
+                                <th>Registrace</th>
+                                <th>Akce</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for supplier in pendingSuppliers %}
+                            <tr id="supplier-{{ supplier.user_id }}">
+                                <td>{{ supplier.user_id }}</td>
+                                <td><strong>{{ supplier.jmeno }}</strong></td>
+                                <td>{{ supplier.email }}</td>
+                                <td>{{ supplier.created_at }}</td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" onclick="approveSupplier({{ supplier.user_id }})">
+                                        <i class="bi bi-check-circle-fill"></i> Schválit
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectSupplier({{ supplier.user_id }})">
+                                        <i class="bi bi-x-circle-fill"></i> Zamítnout
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card card-modern text-center p-4">
+            <i class="bi bi-check-circle-fill" style="font-size: 4rem; color: #10b981;"></i>
+            <h5 class="mt-3" style="color: #64748b;">Žádní dodavatelé nečekají na schválení</h5>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function approveSupplier(userId) {
+    if (!confirm('Opravdu chcete schválit tohoto dodavatele?')) return;
+
+    const formData = new FormData();
+    formData.append('user_id', userId);
+
+    fetch('?page=admin&action=approve', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('supplier-' + userId).remove();
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při schvalování');
+    });
+}
+
+function rejectSupplier(userId) {
+    if (!confirm('Opravdu chcete zamítnout tohoto dodavatele?')) return;
+
+    const formData = new FormData();
+    formData.append('user_id', userId);
+
+    fetch('?page=admin&action=reject', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            document.getElementById('supplier-' + userId).remove();
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při zamítání');
+    });
+}
+</script>
+{% endblock %}

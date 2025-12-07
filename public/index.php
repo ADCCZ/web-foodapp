@@ -99,6 +99,61 @@ switch ($page) {
         }
         break;
 
+    case 'checkout':
+        require_once '../app/Controllers/OrderController.php';
+        $controller = new OrderController();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->createOrder();
+        } else {
+            $controller->checkout();
+        }
+        break;
+
+    case 'orders':
+        require_once '../app/Controllers/OrderController.php';
+        $controller = new OrderController();
+
+        $action = $_GET['action'] ?? 'index';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update-status') {
+            $controller->updateStatus();
+        } elseif ($action === 'view') {
+            $controller->viewOrder();
+        } else {
+            $controller->myOrders();
+        }
+        break;
+
+    case 'admin':
+        require_once '../app/Controllers/AdminController.php';
+        $controller = new AdminController();
+
+        $action = $_GET['action'] ?? 'index';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($action === 'approve') {
+                $controller->approveSupplier();
+            } elseif ($action === 'reject') {
+                $controller->rejectSupplier();
+            } elseif ($action === 'update-role') {
+                $controller->updateRole();
+            } elseif ($action === 'delete-user') {
+                $controller->deleteUser();
+            }
+        } else {
+            if ($action === 'users') {
+                $controller->users();
+            } elseif ($action === 'orders') {
+                $controller->allOrders();
+            } elseif ($action === 'products') {
+                $controller->allProducts();
+            } else {
+                $controller->index();
+            }
+        }
+        break;
+
     default:
         echo "<h1>404 - Stránka nenalezena</h1>";
         break;

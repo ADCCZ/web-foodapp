@@ -1,0 +1,172 @@
+{# app/Views/templates/checkout.twig #}
+{% extends "base.twig" %}
+
+{% block title %}Dokončit objednávku - Délicious{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4" style="color: #0f172a;">
+            <i class="bi bi-credit-card-fill" style="color: #f97316;"></i> Dokončit objednávku
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    {# Order Summary #}
+    <div class="col-lg-8">
+        <div class="card card-modern mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Souhrn objednávky</h5>
+
+                {% for item in cartItems %}
+                <div class="d-flex align-items-center mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                    <div class="me-3">
+                        {% if item.image %}
+                            <img src="uploads/{{ item.image }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                        {% else %}
+                            <div style="width: 60px; height: 60px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-image" style="color: #cbd5e1;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">{{ item.name }}</h6>
+                        <small class="text-muted">{{ item.quantity }}x {{ item.price }} Kč</small>
+                    </div>
+                    <div class="text-end">
+                        <strong>{{ item.subtotal }} Kč</strong>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card card-modern">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Dodací údaje</h5>
+
+                <form id="checkoutForm">
+                    <div class="mb-3">
+                        <label class="form-label form-label-modern">
+                            <i class="bi bi-person-fill me-1"></i> Jméno
+                        </label>
+                        <input type="text" class="form-control form-control-modern" value="{{ session.jmeno }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label form-label-modern">
+                            <i class="bi bi-envelope-fill me-1"></i> Email
+                        </label>
+                        <input type="email" class="form-control form-control-modern" value="{{ session.email|default('Není k dispozici') }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="delivery_address" class="form-label form-label-modern">
+                            <i class="bi bi-geo-alt-fill me-1"></i> Doručovací adresa
+                        </label>
+                        <textarea class="form-control form-control-modern" id="delivery_address" name="delivery_address" rows="2" placeholder="Ulice, číslo popisné, PSČ Město" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label form-label-modern">
+                            <i class="bi bi-telephone-fill me-1"></i> Telefon
+                        </label>
+                        <input type="tel" class="form-control form-control-modern" id="phone" name="phone" placeholder="+420 123 456 789" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="note" class="form-label form-label-modern">
+                            <i class="bi bi-chat-left-text-fill me-1"></i> Poznámka k objednávce (volitelné)
+                        </label>
+                        <textarea class="form-control form-control-modern" id="note" name="note" rows="2" placeholder="Např. čas doručení, předání vrátnici..."></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Total & Submit #}
+    <div class="col-lg-4">
+        <div class="card card-modern position-sticky" style="top: 100px;">
+            <div class="card-body">
+                <h5 class="fw-bold mb-4" style="color: #0f172a;">Celkem k platbě</h5>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Produkty:</span>
+                    <span>{{ total }} Kč</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Doprava:</span>
+                    <span class="text-success">Zdarma</span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <strong style="font-size: 1.3rem;">Celkem:</strong>
+                    <strong style="font-size: 1.3rem; color: #f97316;">{{ total }} Kč</strong>
+                </div>
+
+                <button type="button" class="btn btn-modern btn-modern-primary w-100 py-3 mb-2" id="submitOrder">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span id="orderBtnText">Odeslat objednávku</span>
+                </button>
+
+                <a href="?page=cart" class="btn btn-modern btn-modern-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i> Zpět do košíku
+                </a>
+
+                <div class="mt-3 text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check" style="color: #f97316;"></i> Bezpečná platba
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('submitOrder').addEventListener('click', function() {
+    const form = document.getElementById('checkoutForm');
+
+    // Validate form
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const btn = this;
+    const btnText = document.getElementById('orderBtnText');
+
+    btn.disabled = true;
+    btnText.innerHTML = 'Zpracovávám<span class="spinner-modern"></span>';
+
+    fetch('?page=checkout', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success and redirect to orders
+            alert('✓ ' + data.message + '\n\nČíslo objednávky: #' + data.order_id);
+            window.location.href = '?page=orders';
+        } else {
+            alert('✗ ' + data.message);
+            btn.disabled = false;
+            btnText.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Odeslat objednávku';
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při odesílání objednávky');
+        btn.disabled = false;
+        btnText.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Odeslat objednávku';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{# app/Views/templates/order_detail.twig #}
+{% extends "base.twig" %}
+
+{% block title %}Detail objednávky #{{ order.order_id }} - Délicious{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <a href="?page=orders" class="btn btn-modern btn-modern-secondary btn-sm mb-3">
+            <i class="bi bi-arrow-left"></i> Zpět na objednávky
+        </a>
+
+        <h2 class="fw-bold" style="color: #0f172a;">
+            <i class="bi bi-receipt" style="color: #f97316;"></i> Objednávka #{{ order.order_id }}
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        {# Order Items #}
+        <div class="card card-modern mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Objednané položky</h5>
+
+                {% for item in order.items %}
+                <div class="d-flex align-items-center mb-3 pb-3 {% if not loop.last %}border-bottom{% endif %}">
+                    <div class="me-3">
+                        {% if item.image %}
+                            <img src="uploads/{{ item.image }}" alt="{{ item.name }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                        {% else %}
+                            <div style="width: 80px; height: 80px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-image" style="font-size: 2rem; color: #cbd5e1;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ item.name }}</h6>
+                        {% if session.role == 'konzument' %}
+                        <small class="text-muted">
+                            <i class="bi bi-shop"></i> {{ item.supplier_name }}
+                        </small>
+                        {% endif %}
+                    </div>
+                    <div class="text-center me-3">
+                        <small class="text-muted d-block">Množství</small>
+                        <strong>{{ item.quantity }}x</strong>
+                    </div>
+                    <div class="text-center me-3">
+                        <small class="text-muted d-block">Cena/ks</small>
+                        <strong>{{ item.price }} Kč</strong>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">Celkem</small>
+                        <strong style="color: #f97316;">{{ (item.price * item.quantity)|number_format(2, '.', '') }} Kč</strong>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="text-end mt-3 pt-3 border-top">
+                    <h5 class="mb-0">
+                        Celkem: <strong style="color: #f97316;">{{ order.total_price }} Kč</strong>
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {# Order Info #}
+        <div class="card card-modern mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Informace o objednávce</h5>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Číslo objednávky:</small>
+                    <strong>#{{ order.order_id }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Datum vytvoření:</small>
+                    <strong>{{ order.created_at }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block">Stav:</small>
+                    {% if order.status == 'pending' %}
+                        <span class="badge bg-warning">Čeká na zpracování</span>
+                    {% elseif order.status == 'processing' %}
+                        <span class="badge bg-info">Zpracovává se</span>
+                    {% elseif order.status == 'completed' %}
+                        <span class="badge bg-success">Dokončeno</span>
+                    {% elseif order.status == 'cancelled' %}
+                        <span class="badge bg-danger">Zrušeno</span>
+                    {% endif %}
+                </div>
+
+                {% if session.role == 'dodavatel' %}
+                <div class="mb-3">
+                    <small class="text-muted d-block">Zákazník:</small>
+                    <strong>{{ order.customer_name }}</strong><br>
+                    <small>{{ order.customer_email }}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Change Status (for suppliers) #}
+        {% if session.role == 'dodavatel' %}
+        <div class="card card-modern">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Změnit stav</h5>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-warning btn-sm" onclick="updateStatus({{ order.order_id }}, 'pending')">
+                        Čeká na zpracování
+                    </button>
+                    <button class="btn btn-info btn-sm" onclick="updateStatus({{ order.order_id }}, 'processing')">
+                        Zpracovává se
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="updateStatus({{ order.order_id }}, 'completed')">
+                        Dokončeno
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="updateStatus({{ order.order_id }}, 'cancelled')">
+                        Zrušeno
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if session.role == 'dodavatel' %}
+<script>
+function updateStatus(orderId, status) {
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('status', status);
+
+    fetch('?page=orders&action=update-status', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        alert('Chyba při změně stavu');
+    });
+}
+</script>
+{% endif %}
+{% endblock %}
