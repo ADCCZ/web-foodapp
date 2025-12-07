@@ -43,6 +43,16 @@
                         </a>
                     </li>
                     {% endif %}
+                    {% if session.role is defined and session.role == 'konzument' %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="?page=cart">
+                            <i class="bi bi-cart-fill"></i> Košík
+                            <span id="cartCount" class="badge bg-danger position-absolute top-0 start-100 translate-middle {% if session.cart is not defined or session.cart|length == 0 %}d-none{% endif %}">
+                                {% if session.cart is defined %}{{ session.cart|length }}{% endif %}
+                            </span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.user_id is defined %}

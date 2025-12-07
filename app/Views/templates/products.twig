@@ -86,10 +86,55 @@
 
 {% block extra_js %}
 <script>
-// Add to cart function (will be implemented with CartController)
+// Add to cart function with AJAX
 function addToCart(productId) {
-    // TODO: Implement AJAX add to cart
-    alert('Přidání do košíku bude implementováno v dalším kroku. Produkt ID: ' + productId);
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    formData.append('quantity', 1);
+
+    fetch('?page=cart&action=add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            showNotification(data.message, 'success');
+
+            // Update cart count in navbar if exists
+            updateCartCount(data.cartCount);
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Chyba:', error);
+        showNotification('Chyba při přidávání do košíku', 'error');
+    });
+}
+
+// Show notification
+function showNotification(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}-fill me-2"></i>${message}`;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+// Update cart count badge
+function updateCartCount(count) {
+    const cartBadge = document.getElementById('cartCount');
+    if (cartBadge && count > 0) {
+        cartBadge.textContent = count;
+        cartBadge.classList.remove('d-none');
+    }
 }
 </script>
 {% endblock %}

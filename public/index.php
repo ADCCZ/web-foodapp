@@ -78,6 +78,27 @@ switch ($page) {
         }
         break;
 
+    case 'cart':
+        require_once '../app/Controllers/CartController.php';
+        $controller = new CartController();
+
+        $action = $_GET['action'] ?? 'index';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($action === 'add') {
+                $controller->addToCart();
+            } elseif ($action === 'update') {
+                $controller->updateQuantity();
+            } elseif ($action === 'remove') {
+                $controller->removeFromCart();
+            } elseif ($action === 'clear') {
+                $controller->clearCart();
+            }
+        } else {
+            $controller->index();
+        }
+        break;
+
     default:
         echo "<h1>404 - Stránka nenalezena</h1>";
         break;
