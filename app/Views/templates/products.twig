@@ -5,27 +5,27 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="col-12 py-4">
+        <div class="d-flex justify-content-between align-items-center">
             <h2 class="fw-bold" style="color: #0f172a;">
                 <i class="bi bi-basket-fill" style="color: #f97316;"></i> Naše nabídka
             </h2>
             {% if session.role is defined and session.role == 'dodavatel' %}
                 <a href="?page=supplier" class="btn btn-modern btn-modern-primary">
-                    <i class="bi bi-plus-circle-fill"></i> Přidat produkt
+                    <i class="bi bi-shop-window"></i> Správa produktů
                 </a>
             {% endif %}
         </div>
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-3">
     {% if products|length > 0 %}
         {% for product in products %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-modern h-100">
+        <div class="col-sm-6 col-md-6 col-lg-4 mb-3">
+            <div class="card-modern h-100">
                 {# Product Image #}
-                <div class="position-relative" style="height: 200px; overflow: hidden; background: #f1f5f9; border-radius: 12px 12px 0 0;">
+                <div class="position-relative" style="height: 150px; overflow: hidden; background: #f1f5f9; border-radius: 12px 12px 0 0;">
                     {% if product.image %}
                         <img src="uploads/{{ product.image }}" alt="{{ product.name }}" class="w-100 h-100" style="object-fit: cover;">
                     {% else %}
@@ -41,28 +41,28 @@
                     </div>
                 </div>
 
-                <div class="card-body d-flex flex-column">
+                <div class="card-body d-flex flex-column p-3">
                     {# Product Name #}
-                    <h5 class="fw-bold mb-2" style="color: #0f172a;">{{ product.name }}</h5>
+                    <h6 class="fw-bold mb-2" style="color: #0f172a; font-size: 1rem;">{{ product.name }}</h6>
 
                     {# Supplier Name #}
-                    <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                    <p class="text-muted mb-2" style="font-size: 0.85rem;">
                         <i class="bi bi-shop" style="color: #f97316;"></i> {{ product.supplier_name }}
                     </p>
 
                     {# Description #}
-                    <p class="mb-3" style="color: #64748b; flex-grow: 1;">
-                        {{ product.description|length > 100 ? product.description|slice(0, 100) ~ '...' : product.description }}
+                    <p class="mb-3" style="color: #64748b; font-size: 0.9rem;">
+                        {{ product.description|length > 80 ? product.description|slice(0, 80) ~ '...' : product.description }}
                     </p>
 
                     {# Actions #}
-                    <div class="d-grid gap-2">
+                    <div class="d-grid mt-auto">
                         {% if session.user_id is defined and session.role == 'konzument' %}
-                            <button class="btn btn-modern btn-modern-primary" onclick="addToCart({{ product.product_id }})">
+                            <button class="btn btn-modern btn-modern-primary btn-sm" onclick="addToCart({{ product.product_id }})">
                                 <i class="bi bi-cart-plus-fill"></i> Přidat do košíku
                             </button>
                         {% elseif session.user_id is not defined %}
-                            <a href="?page=login" class="btn btn-modern btn-modern-secondary">
+                            <a href="?page=login" class="btn btn-modern btn-modern-secondary btn-sm">
                                 <i class="bi bi-box-arrow-in-right"></i> Přihlaste se pro objednání
                             </a>
                         {% endif %}

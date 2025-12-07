@@ -31,11 +31,12 @@ class LoginController {
         // 3. Ověříme heslo
         // $user existuje A ZÁROVEŇ heslo sedí (password_verify porovná zadané heslo s hashem v DB)
         if ($user && password_verify($password, $user['password'])) {
-            
+
             // Vše OK -> Uložíme uživatele do session
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['jmeno'] = $user['jmeno'];
+            $_SESSION['is_approved'] = $user['is_approved']; // Pro dodavatele
 
             echo json_encode([
                 'success' => true,

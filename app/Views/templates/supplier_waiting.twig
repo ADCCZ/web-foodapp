@@ -1,0 +1,30 @@
+{# app/Views/templates/supplier_waiting.twig #}
+{% extends "base.twig" %}
+
+{% block title %}Čekání na schválení - Délicious{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
+    <div class="col-11 col-md-8 col-lg-6">
+        <div class="card card-modern text-center p-5">
+            <div class="icon-wrapper mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2.5rem; background: #f97316;">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <h2 class="fw-bold mb-3" style="color: #0f172a;">Váš účet čeká na schválení</h2>
+            <p class="lead mb-4" style="color: #64748b;">
+                Váš účet dodavatele byl úspěšně vytvořen, ale musí být nejprve schválen administrátorem.
+            </p>
+            <div class="alert alert-modern" style="background: #fff7ed; border-left: 4px solid #f97316;">
+                <p class="mb-0" style="color: #9a3412;">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <strong>Co dál?</strong><br>
+                    Administrátor zkontroluje váš účet a schválí ho co nejdříve. Poté budete moci přidávat produkty.
+                </p>
+            </div>
+            <a href="?page=home" class="btn btn-modern btn-modern-primary mt-3">
+                <i class="bi bi-house-fill me-2"></i> Zpět na homepage
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

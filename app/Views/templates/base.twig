@@ -36,6 +36,13 @@
                             <i class="bi bi-basket-fill"></i> Nabídka
                         </a>
                     </li>
+                    {% if session.role is defined and session.role == 'dodavatel' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="?page=supplier">
+                            <i class="bi bi-shop-window"></i> Moje produkty
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.user_id is defined %}
@@ -70,12 +77,12 @@
     </nav>
 
     {# Hlavní obsah stránky - každá šablona si ho naplní po svém #}
-    <main class="container-modern">
+    <main class="container mt-4 mb-4">
         {% block content %}{% endblock %}
     </main>
 
     {# Footer #}
-    <footer class="text-center py-4 mt-5">
+    <footer class="text-center py-2">
         <div class="container">
             <p class="mb-0" style="color: #64748b;">
                 <i class="bi bi-heart-fill" style="color: #f97316;"></i> Délicious &copy; 2025

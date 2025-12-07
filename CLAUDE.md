@@ -191,6 +191,15 @@ case 'newpage':
 - Keep code comments concise and technical
 - Documentation should be clean and professional
 
+**Git Commit Messages:**
+- Use lowercase with underscores and ampersands
+- Format: `feature-description_&_additional-info`
+- Examples:
+  - `add-product-listing_&_product-controller`
+  - `modern-gradient-ui-design_&_documentation`
+  - `product-edit-functionality_&_ui-fixes`
+- Keep messages concise and descriptive
+
 ## Academic Requirements & Grading
 
 ### Grading System

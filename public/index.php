@@ -58,6 +58,26 @@ switch ($page) {
         $controller->index();
         break;
 
+    case 'supplier':
+        require_once '../app/Controllers/SupplierController.php';
+        $controller = new SupplierController();
+
+        // Handle different actions
+        $action = $_GET['action'] ?? 'index';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($action === 'create') {
+                $controller->createProduct();
+            } elseif ($action === 'update') {
+                $controller->updateProduct();
+            } elseif ($action === 'delete') {
+                $controller->deleteProduct();
+            }
+        } else {
+            $controller->index();
+        }
+        break;
+
     default:
         echo "<h1>404 - Stránka nenalezena</h1>";
         break;
