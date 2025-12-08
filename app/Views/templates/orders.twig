@@ -19,9 +19,9 @@
     <div class="col-12 mb-3">
         <div class="card card-modern">
             <div class="card-body">
-                <div class="row align-items-center">
+                <div class="row align-items-center align-items-md-center align-items-sm-start">
                     {# Order Info #}
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
                         <h6 class="mb-1" style="color: #0f172a;">
                             <i class="bi bi-hash"></i> Objednávka {{ order.order_id }}
                         </h6>
@@ -32,7 +32,7 @@
 
                     {# Customer Info (for suppliers) #}
                     {% if session.role == 'dodavatel' %}
-                    <div class="col-md-3">
+                    <div class="col-12 col-md-3 mb-2 mb-md-0">
                         <small class="text-muted d-block">Zákazník:</small>
                         <strong>{{ order.customer_name }}</strong><br>
                         <small class="text-muted">{{ order.customer_email }}</small>
@@ -40,7 +40,8 @@
                     {% endif %}
 
                     {# Status #}
-                    <div class="{% if session.role == 'dodavatel' %}col-md-2{% else %}col-md-3{% endif %}">
+                    <div class="col-6 {% if session.role == 'dodavatel' %}col-md-2{% else %}col-md-3{% endif %} mb-2 mb-md-0">
+                        <small class="text-muted d-block d-md-none">Stav:</small>
                         {% if order.status == 'pending' %}
                             <span class="badge bg-warning">Čeká na zpracování</span>
                         {% elseif order.status == 'processing' %}
@@ -53,14 +54,14 @@
                     </div>
 
                     {# Price #}
-                    <div class="{% if session.role == 'dodavatel' %}col-md-2{% else %}col-md-3{% endif %} text-end">
+                    <div class="col-6 {% if session.role == 'dodavatel' %}col-md-2{% else %}col-md-3{% endif %} text-start text-md-end mb-2 mb-md-0">
                         <small class="text-muted d-block">Celkem:</small>
                         <strong style="color: #f97316; font-size: 1.1rem;">{{ order.total_price }} Kč</strong>
                     </div>
 
                     {# Actions #}
-                    <div class="{% if session.role == 'dodavatel' %}col-md-2{% else %}col-md-3{% endif %} text-end">
-                        <a href="?page=orders&action=view&id={{ order.order_id }}" class="btn btn-modern btn-modern-primary btn-sm">
+                    <div class="col-12 {% if session.role == 'dodavatel' %}col-md-2{% else %}col-md-3{% endif %} text-start text-md-end">
+                        <a href="?page=orders&action=view&id={{ order.order_id }}" class="btn btn-modern btn-modern-primary btn-sm w-100 w-md-auto">
                             <i class="bi bi-eye-fill"></i> Detail
                         </a>
                     </div>
