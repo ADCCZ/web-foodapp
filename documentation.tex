@@ -1,0 +1,199 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+% Nastavení hypertextových odkazů
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Délicious - Dokumentace semestrální práce},
+    pdfauthor={Oldřich Jan Švehla}
+}
+
+\begin{document}
+
+% Titulní informace
+\begin{center}
+    {\LARGE\bfseries Délicious - Food Delivery Ordering System}\\[0.5cm]
+    {\large Dokumentace semestrální práce}\\[1cm]
+
+    \begin{tabular}{rl}
+        \textbf{Jméno:} & Oldřich Jan Švehla \\
+        \textbf{Email:} & tmwmf@students.zcu.cz \\
+        \textbf{Datum vytvoření:} & 9. prosince 2025 \\
+        \textbf{Předmět:} & KIV/WEB (Webové aplikace) \\
+        \textbf{Název aplikace:} & Délicious \\
+    \end{tabular}
+\end{center}
+
+\vspace{1cm}
+
+\section{URL aplikace}
+Aplikace běží lokálně na XAMPP serveru: \url{http://localhost/web-foodapp/}
+
+\section{Zadání práce}
+
+\subsection{Oficiální zadání}
+\textbf{Objednávkový systém (např. rozvoz potravin)}
+
+Jako příklad lze využít (zjednodušený) web některé z firem pro rozvoz potravin zákazníkům. Role: nepřihlášený uživatel, konzument, dodavatel, administrátor. Nepřihlášený uživatel vidí seznam produktů a může se do systému registrovat jako konzument nebo jako dodavatel (ten by měl být schválen administrátorem). Konzument vidí seznam produktů, které může vkládat do košíku a ten následně objednat. Dále vidí své historické objednávky, včetně produktů a data objednání. Dodavatel může do systému vkládat produkty (a např. může vidět, kolikrát byl který produkt objednán) a vidí nevyřízené objednávky, které může označit za vyřízené. Administrátor spravuje uživatele a může upravit vše potřebné.
+
+\subsection{Realizace}
+Aplikace \textbf{Délicious} (slovní hříčka: Delicious + Delivery) je webová aplikace pro rozvoz jídla, která implementuje zadání s následujícími funkcemi:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Nepřihlášený uživatel:} může procházet seznam produktů, registrovat se jako konzument nebo dodavatel
+    \item \textbf{Konzument:} procházení produktů, přidávání do košíku, vytváření objednávek, zobrazení historických objednávek s produkty a datem
+    \item \textbf{Dodavatel:} správa vlastních produktů (vytváření, editace, mazání s nahráváním obrázků), zobrazení objednávek obsahujících jejich produkty
+    \item \textbf{Administrátor:} schvalování nových dodavatelů, správa všech uživatelů, produktů a objednávek
+    \item Hashování hesel (bcrypt), ochrana proti XSS a SQL injection
+    \item Responsivní design pro mobilní zařízení i PC
+\end{itemize}
+
+\section{Použité technologie}
+
+\subsection{Backend}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{PHP 8.2.12} - implementace MVC architektury, business logika v Controllers, datová vrstva\\v Models
+    \item \textbf{MySQL/MariaDB} - relační databáze se 4 tabulkami (users, products, orders, order\_items)
+    \item \textbf{PDO} - databázová vrstva s prepared statements pro ochranu proti SQL injection
+    \item \textbf{Twig 3.22} - template engine pro všechny Views s auto-escapingem (XSS ochrana)
+    \item \textbf{Composer} - správa závislostí (Twig)
+\end{itemize}
+
+\subsection{Frontend}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{HTML5 + CSS3} - moderní minimalistický design s custom CSS properties
+    \item \textbf{Bootstrap 5.3} - responzivní grid systém, utility třídy, komponenty
+    \item \textbf{Bootstrap Icons} - ikonová sada použitá v celé aplikaci
+    \item \textbf{JavaScript (Vanilla)} - AJAX operace pro košík, správu produktů (fetch API)
+\end{itemize}
+
+\subsection{Vývojové prostředí}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{XAMPP} - Apache server + MySQL databáze
+    \item \textbf{Git/GitHub} - verzování kódu
+    \item \textbf{.htaccess} - URL rewriting, směrování všech požadavků do public/index.php
+\end{itemize}
+
+\section{Adresářová struktura}
+
+\begin{description}[leftmargin=2cm, style=nextline]
+    \item[\texttt{app/Controllers/}] MVC Controllers - obsahuje 8 controllerů (AdminController, CartController, HomeController, LoginController, OrderController, ProductController, RegisterController, SupplierController). Každý má metodu index() pro GET a specifické metody pro POST požadavky.
+
+    \item[\texttt{app/Models/}] MVC Models - obsahuje 4 modely (Database.php pro PDO singleton, User.php, Product.php, Order.php). Zajišťují komunikaci s databází pomocí prepared statements.
+
+    \item[\texttt{app/Views/templates/}] Twig templates - 13 šablon (base.twig jako master layout, home.twig, login.twig, register.twig, products.twig, cart.twig, checkout.twig, orders.twig, order\_detail.twig, supplier.twig, admin\_dashboard.twig, admin\_users.twig, admin\_products.twig, admin\_orders.twig).
+
+    \item[\texttt{app/Helpers/}] Pomocné třídy - TwigHelper.php pro inicializaci Twig s konfigurací (cache, autoescape).
+
+    \item[\texttt{app/autoload.php}] Autoloader pro automatické načítání tříd.
+
+    \item[\texttt{public/index.php}] Jediný vstupní bod aplikace (single entry point). Obsahuje switch-based router, který na základě parametru \texttt{?page=} načítá příslušný controller. Inicializuje session.
+
+    \item[\texttt{public/css/style.css}] Vlastní CSS styly - moderní minimalistický design, responzivní pravidla pro mobilní zařízení.
+
+    \item[\texttt{public/uploads/}] Adresář pro nahrané obrázky produktů.
+
+    \item[\texttt{database/install.sql}] Kompletní instalační SQL skript - vytvoří databázi, všechny tabulky a naplní je testovacími daty.
+
+    \item[\texttt{vendor/}] Composer závislosti (Twig).
+
+    \item[\texttt{.htaccess}] Root htaccess - přesměrování všech požadavků do \texttt{public/} adresáře.
+\end{description}
+
+\section{Architektura aplikace}
+
+\subsection{MVC Pattern s Single Entry Point}
+Aplikace používá architektonický vzor Model-View-Controller:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Router (public/index.php):} Veškerý HTTP provoz směřuje do tohoto souboru díky .htaccess. Switch-case na parametr \texttt{\$\_GET['page']} určuje, který controller se načte. Session je inicializována globálně.
+
+    \item \textbf{Models (app/Models/):}
+    \begin{itemize}
+        \item \texttt{Database.php} - Singleton pattern pro PDO připojení
+        \item \texttt{User.php} - správa uživatelů (registrace, přihlášení, seznam, schvalování)
+        \item \texttt{Product.php} - CRUD operace pro produkty (create, read, update, delete)
+        \item \texttt{Order.php} - správa objednávek (vytváření včetně položek, seznam, detail, změna stavu)
+    \end{itemize}
+
+    \item \textbf{Views (app/Views/templates/):} Twig šablony s auto-escapingem. \texttt{base.twig} je master layout s navbar a bloky (title, content, extra\_js). Ostatní templates z něj dědí. AJAX logika je implementována v block extra\_js.
+
+    \item \textbf{Controllers (app/Controllers/):} Každý má metodu \texttt{index()} pro GET (zobrazení view) a specifické metody pro POST (zpracování formulářů, AJAX). Kontrolují oprávnění na základě \texttt{\$\_SESSION['role']}.
+    \begin{itemize}
+        \item \texttt{HomeController} - úvodní stránka
+        \item \texttt{LoginController} - přihlášení/odhlášení, kontrola schválení dodavatele
+        \item \texttt{RegisterController} - registrace s volbou role
+        \item \texttt{ProductController} - seznam produktů schválených dodavatelů
+        \item \texttt{CartController} - košík v session, AJAX operace (add, update, remove, clear)
+        \item \texttt{OrderController} - checkout, vytvoření objednávky, seznam, detail
+        \item \texttt{SupplierController} - dashboard dodavatele, CRUD produktů s upload obrázků
+        \item \texttt{AdminController} - dashboard, správa uživatelů/produktů/objednávek, schvalování dodavatelů
+    \end{itemize}
+\end{itemize}
+
+\subsection{Bezpečnost}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{SQL Injection:} Všechny dotazy používají PDO prepared statements
+    \item \textbf{XSS:} Twig autoescape='html' v TwigHelper.php
+    \item \textbf{Hesla:} \texttt{password\_hash(PASSWORD\_BCRYPT)}
+    \item \textbf{Upload souborů:} Validace typu (JPG, PNG, GIF, WEBP), velikosti (max 5MB), unikátní názvy
+    \item \textbf{RBAC:} Kontrola role v session před přístupem k chráněným částem
+\end{itemize}
+
+\subsection{Databázový model}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{users} - PK: user\_id, obsahuje email (UNIQUE), password (bcrypt), jmeno, role (konzument/dodavatel/admin), is\_approved, is\_super\_admin
+    \item \textbf{products} - PK: product\_id, FK: supplier\_id -> users, obsahuje name, description, price, image
+    \item \textbf{orders} - PK: order\_id, FK: customer\_id -> users, obsahuje customer\_name, email, delivery\_address, phone, note, status, total\_price
+    \item \textbf{order\_items} - PK: order\_item\_id, FK: order\_id -> orders, FK: product\_id -> products, obsahuje quantity, price
+\end{itemize}
+
+\section{Výchozí uživatelské účty}
+
+Všichni uživatelé mají heslo: \textbf{heslo123}
+
+\subsection{Super Administrátor}
+\begin{itemize}[leftmargin=*]
+    \item Email: \texttt{superadmin@test.cz}
+    \item Heslo: \texttt{heslo123}
+    \item Oprávnění: správa všech uživatelů včetně ostatních administrátorů, nelze smazat, nejvyšší oprávnění v systému
+\end{itemize}
+
+\subsection{Administrátor}
+\begin{itemize}[leftmargin=*]
+    \item Email: \texttt{admin@test.cz}
+    \item Heslo: \texttt{heslo123}
+    \item Oprávnění: správa uživatelů, schvalování dodavatelů, správa všech produktů a objednávek
+\end{itemize}
+
+\subsection{Dodavatelé (schválení)}
+\begin{itemize}[leftmargin=*]
+    \item Email: \texttt{dodavatel@test.cz} - Pizza House (4 produkty)
+    \item Email: \texttt{dodavatel2@test.cz} - Burger King (4 produkty)
+    \item Heslo: \texttt{heslo123}
+    \item Oprávnění: správa vlastních produktů, zobrazení objednávek vlastních produktů
+\end{itemize}
+
+\subsection{Dodavatel (neschválený)}
+\begin{itemize}[leftmargin=*]
+    \item Email: \texttt{dodavatel3@test.cz} - Sushi Bar
+    \item Heslo: \texttt{heslo123}
+    \item Stav: čeká na schválení administrátorem, nemůže se přihlásit
+\end{itemize}
+
+\subsection{Zákazníci}
+\begin{itemize}[leftmargin=*]
+    \item Email: \texttt{zakaznik@test.cz} - Jan Novák (2 testovací objednávky)
+    \item Email: \texttt{zakaznik2@test.cz} - Marie Svobodová (2 testovací objednávky)
+    \item Heslo: \texttt{heslo123}
+    \item Oprávnění: procházení produktů, košík, vytváření objednávek
+\end{itemize}
+
+\end{document}

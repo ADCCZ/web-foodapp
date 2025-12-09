@@ -19,15 +19,16 @@ users (uživatelé)
 
 Ukládá všechny uživatele systému (konzumenti, dodavatelé, administrátoři).
 
-| Sloupec       | Typ          | Popis                                    |
-|---------------|--------------|------------------------------------------|
-| user_id       | INT (PK)     | Primární klíč, auto-increment            |
-| email         | VARCHAR(255) | Email uživatele (UNIQUE)                 |
-| password      | VARCHAR(255) | Bcrypt hash hesla                        |
-| jmeno         | VARCHAR(100) | Jméno/název uživatele                    |
-| role          | ENUM         | 'konzument', 'dodavatel', 'admin'        |
-| is_approved   | TINYINT(1)   | 0 = čeká na schválení, 1 = schválený     |
-| created_at    | TIMESTAMP    | Datum registrace                         |
+| Sloupec        | Typ          | Popis                                    |
+|----------------|--------------|------------------------------------------|
+| user_id        | INT (PK)     | Primární klíč, auto-increment            |
+| email          | VARCHAR(255) | Email uživatele (UNIQUE)                 |
+| password       | VARCHAR(255) | Bcrypt hash hesla                        |
+| jmeno          | VARCHAR(100) | Jméno/název uživatele                    |
+| role           | ENUM         | 'konzument', 'dodavatel', 'admin'        |
+| is_approved    | TINYINT(1)   | 0 = čeká na schválení, 1 = schválený     |
+| is_super_admin | TINYINT(1)   | 0 = běžný uživatel, 1 = super admin      |
+| created_at     | TIMESTAMP    | Datum registrace                         |
 
 **Indexy:**
 - PRIMARY KEY: `user_id`
@@ -36,8 +37,14 @@ Ukládá všechny uživatele systému (konzumenti, dodavatelé, administrátoři
 
 **Role:**
 - **konzument** - běžný zákazník, může objednávat
-- **dodavatel** - může přidávat produkty, vyřizovat objednávky
-- **admin** - plný přístup, schvaluje dodavatele
+- **dodavatel** - může přidávat produkty, zobrazit objednávky vlastních produktů (musí být schválen adminem)
+- **admin** - správa uživatelů, schvalování dodavatelů, správa všech produktů a objednávek
+
+**Super Administrátor:**
+- Má `is_super_admin = 1` a `role = 'admin'`
+- Nejvyšší oprávnění v systému
+- Může spravovat všechny uživatele včetně ostatních administrátorů
+- Nelze smazat ani upravit z aplikace
 
 ---
 
@@ -66,15 +73,20 @@ Produkty přidané dodavateli.
 
 ## Tabulka: orders
 
-Objednávky zákazníků.
+Objednávky zákazníků včetně kompletních dodacích informací.
 
-| Sloupec       | Typ           | Popis                                   |
-|---------------|---------------|-----------------------------------------|
-| order_id      | INT (PK)      | Primární klíč, auto-increment           |
-| customer_id   | INT (FK)      | ID zákazníka → users(user_id)           |
-| status        | ENUM          | 'pending', 'processing', 'completed', 'cancelled' |
-| total_price   | DECIMAL(10,2) | Celková cena objednávky                 |
-| created_at    | TIMESTAMP     | Datum objednání                         |
+| Sloupec          | Typ           | Popis                                   |
+|------------------|---------------|-----------------------------------------|
+| order_id         | INT (PK)      | Primární klíč, auto-increment           |
+| customer_id      | INT (FK)      | ID zákazníka → users(user_id)           |
+| customer_name    | VARCHAR(255)  | Jméno zákazníka (kopie z formuláře)     |
+| email            | VARCHAR(255)  | Email zákazníka (kopie z formuláře)     |
+| delivery_address | TEXT          | Kompletní doručovací adresa             |
+| phone            | VARCHAR(20)   | Telefonní číslo zákazníka               |
+| note             | TEXT          | Poznámka k objednávce (volitelná)       |
+| status           | ENUM          | 'pending', 'processing', 'completed', 'cancelled' |
+| total_price      | DECIMAL(10,2) | Celková cena objednávky v Kč            |
+| created_at       | TIMESTAMP     | Datum a čas objednání                   |
 
 **Indexy:**
 - PRIMARY KEY: `order_id`
@@ -84,10 +96,16 @@ Objednávky zákazníků.
 - `customer_id` → `users(user_id)` ON DELETE CASCADE
 
 **Stavy objednávky:**
-- **pending** - nová, čeká na zpracování
+- **pending** - nová, čeká na zpracování (výchozí)
 - **processing** - dodavatel ji zpracovává
-- **completed** - dokončená, vyřízená
+- **completed** - dokončená, vyřízená, doručená
 - **cancelled** - zrušená
+
+**Poznámka:**
+- **customer_name, email:** Ukládají se z checkout formuláře i když je uživatel přihlášen (pro historii a archivaci)
+- **delivery_address:** Kompletní adresa včetně města a PSČ
+- **phone:** Pro kontakt při doručování
+- **note:** Volitelná poznámka zákazníka (např. "Zazvonit na byt 42")
 
 ---
 
@@ -132,7 +150,7 @@ SELECT o.*,
        COUNT(oi.order_item_id) AS pocet_polozek
 FROM orders o
 LEFT JOIN order_items oi ON o.order_id = oi.order_id
-WHERE o.customer_id = 5
+WHERE o.customer_id = 6  -- Jan Novák (zakaznik@test.cz)
 GROUP BY o.order_id
 ORDER BY o.created_at DESC;
 ```
@@ -163,7 +181,7 @@ SELECT DISTINCT o.*
 FROM orders o
 JOIN order_items oi ON o.order_id = oi.order_id
 JOIN products p ON oi.product_id = p.product_id
-WHERE p.supplier_id = 2
+WHERE p.supplier_id = 3  -- Pizza House (dodavatel@test.cz)
   AND o.status IN ('pending', 'processing')
 ORDER BY o.created_at ASC;
 ```
@@ -175,26 +193,61 @@ ORDER BY o.created_at ASC;
 Po importu `install.sql` máte k dispozici:
 
 ### Uživatelé (heslo pro všechny: heslo123)
-- **admin@test.cz** - administrátor
-- **dodavatel@test.cz** - Pizza House (schválený)
-- **dodavatel2@test.cz** - Burger King (schválený)
-- **dodavatel3@test.cz** - Sushi Bar (NESCHVÁLENÝ - pro testování schvalování)
-- **zakaznik@test.cz** - Jan Novák
-- **zakaznik2@test.cz** - Marie Svobodová
+- **superadmin@test.cz** - Super Administrátor (is_super_admin = 1, nejvyšší oprávnění)
+- **admin@test.cz** - Administrátor Systému
+- **dodavatel@test.cz** - Pizza House (schválený, 4 produkty)
+- **dodavatel2@test.cz** - Burger King (schválený, 4 produkty)
+- **dodavatel3@test.cz** - Sushi Bar (NESCHVÁLENÝ, 2 produkty - pro testování schvalování)
+- **zakaznik@test.cz** - Jan Novák (2 testovací objednávky)
+- **zakaznik2@test.cz** - Marie Svobodová (2 testovací objednávky)
 
 ### Produkty
-- 10 produktů (pizzy, burgery, sushi)
+- 10 produktů celkem (pizzy, burgery, nápoje, hranolky, sushi)
+- 8 produktů od schválených dodavatelů (viditelné v aplikaci)
+- 2 produkty od neschváleného dodavatele (skryté, dokud není schválen)
 
 ### Objednávky
 - 4 objednávky v různých stavech (completed, processing, pending)
 - S více položkami pro testování
+- Obsahují kompletní dodací informace (jméno, adresa, telefon, poznámka)
 
 ---
 
-## Migrace a změny
+## Instalace databáze
 
-Pro budoucí změny schématu vytvářejte nové soubory:
-- `migration_001_add_column.sql`
-- `migration_002_new_table.sql`
+Kompletní databáze včetně všech tabulek a testovacích dat se instaluje pomocí jediného souboru:
 
-Vždy začněte záložní kopií databáze!
+```bash
+mysql -u root -p foodapp < database/install.sql
+```
+
+Nebo importujte `database/install.sql` v **phpMyAdmin**.
+
+### Co install.sql obsahuje:
+- Vytvoření všech 4 tabulek s indexy a foreign keys
+- 7 testovacích uživatelů (včetně superadmina)
+- 10 produktů
+- 4 testovací objednávky
+- 9 položek objednávek
+
+**Poznámka:** Skript automaticky dropne existující tabulky před vytvořením nových, takže můžete ho použít i pro reset databáze.
+
+---
+
+## Bezpečnostní opatření
+
+- **SQL Injection:** Všechny dotazy používají PDO prepared statements
+- **XSS Protection:** Twig má auto-escape zapnuté globálně
+- **Password Security:** Bcrypt hashování (`password_hash()` a `password_verify()`)
+- **File Upload Security:** Validace typu, velikosti, generování unikátních názvů
+- **RBAC:** Role-based access control s kontrolou oprávnění v každém controlleru
+
+---
+
+## Charset a Collation
+
+- **Character Set:** `utf8mb4`
+- **Collation:** `utf8mb4_general_ci`
+- **Engine:** InnoDB (pro foreign keys a transakce)
+
+Toto zajišťuje správnou podporu českých znaků včetně emoji.

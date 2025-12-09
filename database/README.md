@@ -42,18 +42,19 @@ mysql -u root foodapp < database/install.sql
 Po importu zkontrolujte v phpMyAdmin:
 
 ### Měli byste vidět 4 tabulky:
-- `users` (6 záznamů)
+- `users` (7 záznamů)
 - `products` (10 záznamů)
 - `orders` (4 záznamy)
 - `order_items` (9 záznamů)
 
 ### Testovací účty (heslo pro všechny: heslo123):
-- **admin@test.cz** - administrátor
-- **dodavatel@test.cz** - Pizza House (schválený dodavatel)
-- **dodavatel2@test.cz** - Burger King (schválený dodavatel)
-- **dodavatel3@test.cz** - Sushi Bar (NESCHVÁLENÝ - pro testování)
-- **zakaznik@test.cz** - Jan Novák (zákazník)
-- **zakaznik2@test.cz** - Marie Svobodová (zákazník)
+- **superadmin@test.cz** - Super Administrátor (nejvyšší oprávnění, nelze smazat)
+- **admin@test.cz** - Administrátor Systému
+- **dodavatel@test.cz** - Pizza House (schválený dodavatel, 4 produkty)
+- **dodavatel2@test.cz** - Burger King (schválený dodavatel, 4 produkty)
+- **dodavatel3@test.cz** - Sushi Bar (NESCHVÁLENÝ - pro testování schvalování, 2 produkty)
+- **zakaznik@test.cz** - Jan Novák (zákazník, 2 testovací objednávky)
+- **zakaznik2@test.cz** - Marie Svobodová (zákazník, 2 testovací objednávky)
 
 ---
 
@@ -152,12 +153,17 @@ mysql -u root -p foodapp < backup_foodapp_2024-11-19.sql
 ## SQL soubory v této složce
 
 - **install.sql** - Kompletní instalace databáze (tabulky + testovací data)
-- **schema.md** - Dokumentace databázového schématu
-- **README.md** - Tento soubor (návod k instalaci)
+  - Vytvoří všechny 4 tabulky s indexy a foreign keys
+  - Naplní databázi 7 uživateli, 10 produkty, 4 objednávkami
+  - Automaticky dropne existující tabulky před vytvořením nových
 
-Pro budoucí migrace vytvářejte nové soubory:
-- `migration_001_description.sql`
-- `migration_002_description.sql`
+- **schema.md** - Detailní dokumentace databázového schématu
+  - Popis všech tabulek a sloupců
+  - Vztahy mezi tabulkami (foreign keys)
+  - Příklady SQL dotazů
+  - Bezpečnostní opatření
+
+- **README.md** - Tento soubor (návod k instalaci)
 
 ---
 
