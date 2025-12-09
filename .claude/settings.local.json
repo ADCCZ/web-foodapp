@@ -12,7 +12,12 @@
       "Bash(php fix_encoding.php:*)",
       "Bash(database/foodapp_export.sql)",
       "Bash(git add:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(php -l:*)",
+      "Bash(ls:*)",
+      "Bash(where:*)",
+      "Bash(pdflatex:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

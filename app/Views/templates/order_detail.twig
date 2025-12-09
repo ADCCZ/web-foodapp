@@ -6,13 +6,25 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <a href="?page=orders" class="btn btn-modern btn-modern-secondary btn-sm mb-3">
-            <i class="bi bi-arrow-left"></i> Zpět na objednávky
-        </a>
-
-        <h2 class="fw-bold" style="color: #0f172a;">
-            <i class="bi bi-receipt" style="color: #f97316;"></i> Objednávka #{{ order.order_id }}
-        </h2>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h2 class="fw-bold mb-0" style="color: #0f172a;">
+                <i class="bi bi-receipt" style="color: #f97316;"></i> Objednávka #{{ order.order_id }}
+            </h2>
+            <div class="d-flex gap-2">
+                {% if session.role == 'admin' and order.customer_id != session.user_id %}
+                    <a href="?page=admin" class="btn btn-modern btn-modern-secondary btn-sm">
+                        <i class="bi bi-speedometer2"></i> Zpět na dashboard
+                    </a>
+                    <a href="?page=admin&action=orders" class="btn btn-modern btn-modern-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Zpět na všechny objednávky
+                    </a>
+                {% else %}
+                    <a href="?page=orders" class="btn btn-modern btn-modern-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Zpět na objednávky
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
@@ -100,6 +112,35 @@
                     <small class="text-muted d-block">Zákazník:</small>
                     <strong>{{ order.customer_name }}</strong><br>
                     <small>{{ order.customer_email }}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Delivery Information #}
+        <div class="card card-modern mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3" style="color: #0f172a;">Dodací údaje</h5>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block"><i class="bi bi-envelope-fill me-1"></i> Email:</small>
+                    <strong>{{ order.email }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block"><i class="bi bi-geo-alt-fill me-1"></i> Doručovací adresa:</small>
+                    <strong>{{ order.delivery_address }}</strong>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted d-block"><i class="bi bi-telephone-fill me-1"></i> Telefon:</small>
+                    <strong>{{ order.phone }}</strong>
+                </div>
+
+                {% if order.note %}
+                <div class="mb-0">
+                    <small class="text-muted d-block"><i class="bi bi-chat-left-text-fill me-1"></i> Poznámka:</small>
+                    <p class="mb-0">{{ order.note }}</p>
                 </div>
                 {% endif %}
             </div>

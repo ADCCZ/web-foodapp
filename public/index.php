@@ -9,8 +9,19 @@ error_reporting(E_ALL);
 // 2. Start session (aby si web pamatoval přihlášeného uživatele)
 session_start();
 
-// 3. Načtení databáze (aby byla dostupná všude)
-require_once '../app/Models/Database.php';
+// 3. Načtení autoloaderu pro namespaces
+require_once '../vendor/autoload.php';  // Composer autoloader
+require_once '../app/autoload.php';     // Custom PSR-4 autoloader
+
+// Import namespace classes
+use App\Controllers\HomeController;
+use App\Controllers\LoginController;
+use App\Controllers\RegisterController;
+use App\Controllers\ProductController;
+use App\Controllers\SupplierController;
+use App\Controllers\CartController;
+use App\Controllers\OrderController;
+use App\Controllers\AdminController;
 
 // 4. Jednoduchý Router
 // Získáme název stránky z URL (např. index.php?page=login). Pokud není, je to 'home'.
@@ -19,13 +30,11 @@ $page = $_GET['page'] ?? 'home';
 // Přepínač stránek
 switch ($page) {
     case 'home':
-        require_once '../app/Controllers/HomeController.php';
         $controller = new HomeController();
         $controller->index();
         break;
 
     case 'login':
-        require_once '../app/Controllers/LoginController.php';
         $controller = new LoginController();
         // Pokud byl odeslán formulář, zpracuj ho, jinak ukaž stránku
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +45,6 @@ switch ($page) {
         break;
 
     case 'register':
-        require_once '../app/Controllers/RegisterController.php';
         $controller = new RegisterController();
         // Pokud se odesílá formulář (AJAX POST)
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,19 +55,24 @@ switch ($page) {
         break;
 
     case 'logout':
-         require_once '../app/Controllers/LoginController.php';
          $controller = new LoginController();
          $controller->logout();
          break;
 
     case 'products':
-        require_once '../app/Controllers/ProductController.php';
         $controller = new ProductController();
-        $controller->index();
+
+        // Handle different actions
+        $action = $_GET['action'] ?? 'index';
+
+        if ($action === 'search' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->search();
+        } else {
+            $controller->index();
+        }
         break;
 
     case 'supplier':
-        require_once '../app/Controllers/SupplierController.php';
         $controller = new SupplierController();
 
         // Handle different actions
@@ -79,7 +92,6 @@ switch ($page) {
         break;
 
     case 'cart':
-        require_once '../app/Controllers/CartController.php';
         $controller = new CartController();
 
         $action = $_GET['action'] ?? 'index';
@@ -100,7 +112,6 @@ switch ($page) {
         break;
 
     case 'checkout':
-        require_once '../app/Controllers/OrderController.php';
         $controller = new OrderController();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -111,7 +122,6 @@ switch ($page) {
         break;
 
     case 'orders':
-        require_once '../app/Controllers/OrderController.php';
         $controller = new OrderController();
 
         $action = $_GET['action'] ?? 'index';
@@ -126,7 +136,6 @@ switch ($page) {
         break;
 
     case 'admin':
-        require_once '../app/Controllers/AdminController.php';
         $controller = new AdminController();
 
         $action = $_GET['action'] ?? 'index';

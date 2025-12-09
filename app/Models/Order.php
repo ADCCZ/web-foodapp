@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Models;
+
+use PDO;
+
 /**
  * Order Model
  * Handles database operations for orders and order items
@@ -16,18 +20,28 @@ class Order {
      * @param int $userId Customer ID
      * @param array $items Order items
      * @param float $total Total price
+     * @param string $customerName Customer name
+     * @param string $email Customer email
+     * @param string $deliveryAddress Delivery address
+     * @param string $phone Customer phone
+     * @param string $note Optional note
      * @return int|false Order ID or false on failure
      */
-    public function createOrder($userId, $items, $total) {
+    public function createOrder($userId, $items, $total, $customerName, $email, $deliveryAddress, $phone, $note = '') {
         try {
             $this->conn->beginTransaction();
 
             // Insert into orders table
-            $sql = "INSERT INTO orders (customer_id, total_price, status, created_at)
-                    VALUES (:customer_id, :total_price, 'pending', NOW())";
+            $sql = "INSERT INTO orders (customer_id, customer_name, email, delivery_address, phone, note, total_price, status, created_at)
+                    VALUES (:customer_id, :customer_name, :email, :delivery_address, :phone, :note, :total_price, 'pending', NOW())";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':customer_id' => $userId,
+                ':customer_name' => $customerName,
+                ':email' => $email,
+                ':delivery_address' => $deliveryAddress,
+                ':phone' => $phone,
+                ':note' => $note,
                 ':total_price' => $total
             ]);
 

@@ -1,35 +1,49 @@
 <?php
 // app/Helpers/TwigHelper.php
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+namespace App\Helpers;
 
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
+use Twig\Extension\DebugExtension;
+
+/**
+ * TwigHelper
+ * Helper class for Twig template engine
+ * Uses singleton pattern for Twig Environment instance
+ */
 class TwigHelper {
     private static $twig = null;
 
     /**
-     * Inicializace Twig enginu (singleton pattern)
+     * Get Twig Environment instance (singleton)
+     * Initializes Twig with cache and debug settings
+     * @return \Twig\Environment Twig instance
      */
     public static function getTwig() {
         if (self::$twig === null) {
-            $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../Views/templates');
-            self::$twig = new \Twig\Environment($loader, [
-                'cache' => __DIR__ . '/../Views/cache', // Pro rychlost - zkompilované šablony
-                'auto_reload' => true, // Při vývoji true, na produkci false
-                'debug' => true, // Pro vývoj
+            // Load templates from app/Views/templates directory
+            $loader = new FilesystemLoader(__DIR__ . '/../Views/templates');
+
+            // Create Twig environment with configuration
+            self::$twig = new Environment($loader, [
+                'cache' => __DIR__ . '/../Views/cache',  // Compiled templates cache
+                'auto_reload' => true,                    // Auto-reload on template change (dev mode)
+                'debug' => true,                          // Enable debug mode (dev mode)
+                'autoescape' => 'html',                   // XSS protection - escape HTML by default
             ]);
 
-            // Přidání debug extension (užitečné při vývoji)
-            self::$twig->addExtension(new \Twig\Extension\DebugExtension());
+            // Add debug extension for development
+            self::$twig->addExtension(new DebugExtension());
         }
         return self::$twig;
     }
 
     /**
-     * Vyrenderuje šablonu a vrátí HTML jako string
-     *
-     * @param string $template - název šablony (např. 'login.twig')
-     * @param array $data - data pro šablonu (např. ['jmeno' => 'Petr'])
-     * @return string - vygenerované HTML
+     * Render template and return HTML string
+     * @param string $template Template filename (e.g., 'login.twig')
+     * @param array $data Data to pass to template
+     * @return string Rendered HTML
      */
     public static function render($template, $data = []) {
         $twig = self::getTwig();
@@ -37,10 +51,9 @@ class TwigHelper {
     }
 
     /**
-     * Vyrenderuje šablonu a rovnou ji vypíše (echo)
-     *
-     * @param string $template
-     * @param array $data
+     * Render template and output directly
+     * @param string $template Template filename
+     * @param array $data Data to pass to template
      */
     public static function display($template, $data = []) {
         echo self::render($template, $data);

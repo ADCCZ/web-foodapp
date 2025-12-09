@@ -28,7 +28,7 @@
         <div class="col-md-6 col-lg-4" id="product-{{ product.product_id }}">
             <div class="card card-modern h-100">
                 {# Product Image #}
-                <div class="position-relative" style="height: 200px; overflow: hidden; background: #f1f5f9; border-radius: 12px 12px 0 0;">
+                <div class="position-relative" style="height: 150px; overflow: hidden; background: #f1f5f9; border-radius: 12px 12px 0 0;">
                     {% if product.image %}
                         <img src="uploads/{{ product.image }}" alt="{{ product.name }}" class="w-100 h-100" style="object-fit: cover;">
                     {% else %}
@@ -95,7 +95,8 @@
                         <label for="description" class="form-label form-label-modern">
                             <i class="bi bi-text-paragraph me-1"></i> Popis
                         </label>
-                        <textarea class="form-control form-control-modern" id="description" name="description" rows="3" required></textarea>
+                        <textarea class="form-control form-control-modern" id="description" name="description" rows="3" maxlength="500" required></textarea>
+                        <small style="color: #64748b;">Maximálně 500 znaků</small>
                     </div>
 
                     <div class="mb-3">
@@ -148,7 +149,8 @@
                         <label for="edit_description" class="form-label form-label-modern">
                             <i class="bi bi-text-paragraph me-1"></i> Popis
                         </label>
-                        <textarea class="form-control form-control-modern" id="edit_description" name="description" rows="3" required></textarea>
+                        <textarea class="form-control form-control-modern" id="edit_description" name="description" rows="3" maxlength="500" required></textarea>
+                        <small style="color: #64748b;">Maximálně 500 znaků</small>
                     </div>
 
                     <div class="mb-3">

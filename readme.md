@@ -7,8 +7,9 @@ Moderní webová aplikace pro objednávání a rozvoz jídla s elegantním desig
 **Délicious** je systém pro rozvoz potravin s více uživatelskými rolemi:
 - **Nepřihlášení uživatelé** - prohlížení produktů, registrace
 - **Konzumenti (zákazníci)** - objednávání produktů, správa košíku, historie objednávek
-- **Dodavatelé** - správa produktů, vyřizování objednávek, statistiky
-- **Administrátoři** - správa uživatelů, schvalování dodavatelů, kompletní přehled
+- **Dodavatelé** - správa produktů, zobrazení objednávek vlastních produktů
+- **Administrátoři** - správa uživatelů, schvalování dodavatelů, správa všech produktů a objednávek
+- **Super Administrátor** - nejvyšší oprávnění, správa všech uživatelů včetně administrátorů, nelze smazat
 
 ## Technologie
 
@@ -21,37 +22,42 @@ Moderní webová aplikace pro objednávání a rozvoz jídla s elegantním desig
 
 ## Funkce
 
-- **Moderní gradient design** - Fialovo-modré gradientní pozadí, glass effect
-- **Responzivní rozhraní** - Bootstrap 5 + vlastní CSS
-- **Bezpečné přihlášení** - Bcrypt hashování, SQL injection ochrana
-- **Košík a objednávky** - AJAX-based nákupní košík
-- **Správa produktů** - Upload obrázků, CRUD operace
-- **Role-based přístup** - Konzumenti, Dodavatelé, Administrátoři
-- **AJAX formuláře** - Bez reload stránky
+- **Moderní minimalistický design** - Čisté pozadí, kontrastní barvy, elegantní layout
+- **Responzivní rozhraní** - Bootstrap 5 + vlastní CSS, optimalizováno pro mobil i PC
+- **Bezpečné přihlášení** - Bcrypt hashování, SQL injection a XSS ochrana
+- **Košík a objednávky** - AJAX-based nákupní košík, kompletní checkout proces
+- **Správa produktů** - Upload obrázků (JPG, PNG, GIF, WEBP), CRUD operace
+- **Role-based přístup** - Konzumenti, Dodavatelé, Administrátoři, Super Administrátor
+- **AJAX funkcionalita** - Košík, produkty, formuláře bez reload stránky
+- **Schvalovací workflow** - Dodavatelé musí být schváleni administrátorem
 
 ## Struktura projektu
 
 ```
 web-foodapp/
 ├── app/
-│   ├── Controllers/        # Controllery (HomeController, LoginController...)
-│   ├── Models/            # Modelové třídy (Database.php)
+│   ├── Controllers/        # 8 Controllerů (Admin, Cart, Home, Login, Order, Product, Register, Supplier)
+│   ├── Models/            # 4 Modely (Database, User, Product, Order)
 │   ├── Views/
-│   │   ├── templates/     # Twig šablony (home.twig, login.twig, register.twig)
+│   │   ├── templates/     # 13 Twig šablon (base, home, login, register, products, cart, checkout, orders, order_detail, supplier, admin_*)
 │   │   └── cache/         # Twig cache (auto-generovaný)
-│   ├── Helpers/           # Pomocné třídy (TwigHelper)
-│   └── Middleware/        # Middleware (připraveno)
+│   ├── Helpers/           # TwigHelper.php
+│   └── autoload.php       # Autoloader pro třídy
 ├── public/
-│   ├── index.php          # Vstupní bod aplikace (router)
+│   ├── index.php          # Vstupní bod aplikace (switch-based router)
 │   ├── css/
-│   │   └── style.css      # Moderní vlastní CSS (gradienty, animace)
-│   ├── js/                # JavaScriptové soubory
-│   └── uploads/           # Nahrané soubory (obrázky produktů)
-├── vendor/                # Composer závislosti (Twig)
-├── database/              # SQL soubory (install.sql, schema.md)
-├── .htaccess             # URL rewriting
-├── composer.json         # Composer konfigurace
-└── README.md             # Tento soubor
+│   │   └── style.css      # Vlastní CSS (minimalistický design, responzivní)
+│   └── uploads/           # Nahrané obrázky produktů
+├── vendor/                # Composer závislosti (Twig 3.22)
+├── database/
+│   ├── install.sql        # Kompletní instalační skript (databáze + testovací data)
+│   └── schema.md          # Popis databázové struktury
+├── .htaccess              # URL rewriting
+├── composer.json          # Composer konfigurace
+├── documentation.tex      # LaTeX dokumentace
+├── documentation.pdf      # Kompilovaná dokumentace (5 stran)
+├── CLAUDE.md              # Pokyny pro Claude Code
+└── README.md              # Tento soubor
 ```
 
 ---
@@ -146,21 +152,25 @@ Otevřete prohlížeč a přejděte na:
 http://localhost/web-foodapp/
 ```
 
-Měli byste vidět moderní home page aplikace **Délicious** s fialovým gradientním pozadím a možností přihlášení/registrace.
+Měli byste vidět moderní home page aplikace **Délicious** s čistým minimalistickým designem a možností přihlášení/registrace.
 
 ---
 
 ## Výchozí uživatelské účty
 
-Po instalaci databáze budou dostupné tyto testovací účty:
+Po instalaci databáze budou dostupné tyto testovací účty (všechna hesla: **heslo123**):
 
-| Role          | Email              | Heslo      | Popis                          |
-|---------------|--------------------|------------|--------------------------------|
-| Administrátor | admin@test.cz      | heslo123   | Plný přístup ke všemu          |
-| Dodavatel     | dodavatel@test.cz  | heslo123   | Může přidávat produkty         |
-| Konzument     | zakaznik@test.cz   | heslo123   | Může objednávat produkty       |
+| Role                 | Email                  | Heslo      | Popis                                              |
+|----------------------|------------------------|------------|----------------------------------------------------|
+| Super Administrátor  | superadmin@test.cz     | heslo123   | Nejvyšší oprávnění, správa všech včetně adminů     |
+| Administrátor        | admin@test.cz          | heslo123   | Správa uživatelů, schvalování dodavatelů           |
+| Dodavatel (schválen) | dodavatel@test.cz      | heslo123   | Pizza House - 4 produkty                           |
+| Dodavatel (schválen) | dodavatel2@test.cz     | heslo123   | Burger King - 4 produkty                           |
+| Dodavatel (čeká)     | dodavatel3@test.cz     | heslo123   | Sushi Bar - neschválený, nemůže se přihlásit       |
+| Konzument            | zakaznik@test.cz       | heslo123   | Jan Novák - 2 testovací objednávky                 |
+| Konzument            | zakaznik2@test.cz      | heslo123   | Marie Svobodová - 2 testovací objednávky           |
 
-> POZOR: Po nasazení do produkce změňte všechna výchozí hesla!
+> **POZOR:** Po nasazení do produkce změňte všechna výchozí hesla!
 
 ---
 
@@ -330,36 +340,22 @@ rm -rf app/Views/cache/*
 
 ## Licence a autor
 
-**Projekt:** Semestrální práce - Webové aplikace
+**Projekt:** Semestrální práce - Webové aplikace (KIV/WEB)
 **Název aplikace:** Délicious
-**Autor:** [Vaše jméno]
-**Email:** [váš email]
-**Rok:** 2024/2025
+**Autor:** Oldřich Daš
+**Email:** oldasvehla@seznam.cz
+**Datum vytvoření:** 9. prosince 2025
 
 ## Design
 
-Aplikace využívá moderní design s:
-- Gradient pozadí (fialovo-modré)
-- Bootstrap Icons
-- Glass effect karty
-- Smooth animace (fade-in, hover efekty)
+Aplikace využívá moderní minimalistický design s:
+- Čisté světlé pozadí (#f8fafc)
+- Kontrastní barvy bez gradientů
+- Bootstrap Icons v celé aplikaci
+- Jednoduché hover efekty
 - Moderní formuláře s ikonami
-- Responzivní layout
+- Čistý kartový design s jemnými stíny
+- Plně responzivní layout (mobil + desktop)
+- CSS proměnné pro konzistentní barevnou paletu
 
 ---
-
-## Checklist před odevzdáním
-
-- [ ] Všechny požadavky ze zadání splněny
-- [ ] Minimum 3 uživatelské role implementovány
-- [ ] Bcrypt hashování hesel
-- [ ] Ochrana proti XSS a SQL injection
-- [ ] Upload souborů funkční a zabezpečený
-- [ ] Responzivní design (PC + mobil)
-- [ ] Databáze naplněná testovacími daty
-- [ ] Dokumentace vytvořena (PDF, 3-4 strany)
-- [ ] Export databáze připraven (`database/install.sql`)
-- [ ] Projekt nahrán na students.kiv.zcu.cz (volitelně)
-- [ ] Projekt v Git repozitáři (bonus body)
-- [ ] Produkční hesla změněna
-- [ ] Výpis chyb vypnutý pro produkci

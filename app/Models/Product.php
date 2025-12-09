@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Models;
+
+use PDO;
+
 /**
  * Product Model
  * Handles database operations for products
@@ -21,7 +25,7 @@ class Product {
                 FROM products p
                 LEFT JOIN users u ON p.supplier_id = u.user_id
                 WHERE u.is_approved = 1
-                ORDER BY p.created_at DESC";
+                ORDER BY p.product_id DESC";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
@@ -130,5 +134,55 @@ class Product {
         $stmt->bindParam(':product_id', $productId, PDO::PARAM_INT);
 
         return $stmt->execute();
+    }
+
+    /**
+     * Search and filter products
+     * @param string|null $searchQuery Search term for name/description
+     * @param int|null $supplierId Filter by supplier ID
+     * @return array List of filtered products
+     */
+    public function searchProducts($searchQuery = null, $supplierId = null) {
+        $sql = "SELECT p.*, u.jmeno as supplier_name
+                FROM products p
+                LEFT JOIN users u ON p.supplier_id = u.user_id
+                WHERE u.is_approved = 1";
+
+        $params = [];
+
+        // Add search query filter
+        if ($searchQuery && trim($searchQuery) !== '') {
+            $sql .= " AND (p.name LIKE :search1 OR p.description LIKE :search2)";
+            $params[':search1'] = '%' . $searchQuery . '%';
+            $params[':search2'] = '%' . $searchQuery . '%';
+        }
+
+        // Add supplier filter
+        if ($supplierId && $supplierId > 0) {
+            $sql .= " AND p.supplier_id = :supplier_id";
+            $params[':supplier_id'] = $supplierId;
+        }
+
+        $sql .= " ORDER BY p.created_at DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get all approved suppliers who have products
+     * @return array List of suppliers
+     */
+    public function getAllSuppliers() {
+        $sql = "SELECT DISTINCT u.user_id, u.jmeno
+                FROM users u
+                INNER JOIN products p ON u.user_id = p.supplier_id
+                WHERE u.is_approved = 1 AND u.role = 'dodavatel'
+                ORDER BY u.jmeno ASC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

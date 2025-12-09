@@ -42,23 +42,23 @@
             </div>
         </div>
 
-        <div class="card card-modern">
+        <div class="card card-modern mb-4">
             <div class="card-body">
                 <h5 class="fw-bold mb-3" style="color: #0f172a;">Dodací údaje</h5>
 
                 <form id="checkoutForm">
                     <div class="mb-3">
-                        <label class="form-label form-label-modern">
+                        <label for="customer_name" class="form-label form-label-modern">
                             <i class="bi bi-person-fill me-1"></i> Jméno
                         </label>
-                        <input type="text" class="form-control form-control-modern" value="{{ session.jmeno }}" readonly>
+                        <input type="text" class="form-control form-control-modern" id="customer_name" name="customer_name" value="{{ session.jmeno }}" placeholder="Vaše jméno" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label form-label-modern">
+                        <label for="email" class="form-label form-label-modern">
                             <i class="bi bi-envelope-fill me-1"></i> Email
                         </label>
-                        <input type="email" class="form-control form-control-modern" value="{{ session.email|default('Není k dispozici') }}" readonly>
+                        <input type="email" class="form-control form-control-modern" id="email" name="email" value="{{ session.email|default('') }}" placeholder="vas@email.cz" required>
                     </div>
 
                     <div class="mb-3">
@@ -72,14 +72,15 @@
                         <label for="phone" class="form-label form-label-modern">
                             <i class="bi bi-telephone-fill me-1"></i> Telefon
                         </label>
-                        <input type="tel" class="form-control form-control-modern" id="phone" name="phone" placeholder="+420 123 456 789" required>
+                        <input type="tel" class="form-control form-control-modern" id="phone" name="phone" placeholder="+420 123 456 789" pattern="[0-9+\s]*" title="Zadejte pouze čísla, mezery a znak +" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="note" class="form-label form-label-modern">
                             <i class="bi bi-chat-left-text-fill me-1"></i> Poznámka k objednávce (volitelné)
                         </label>
-                        <textarea class="form-control form-control-modern" id="note" name="note" rows="2" placeholder="Např. čas doručení, předání vrátnici..."></textarea>
+                        <textarea class="form-control form-control-modern" id="note" name="note" rows="2" placeholder="Např. čas doručení, předání vrátnici..." maxlength="500"></textarea>
+                        <small class="text-muted">Maximálně 500 znaků</small>
                     </div>
                 </form>
             </div>
@@ -92,21 +93,28 @@
             <div class="card-body">
                 <h5 class="fw-bold mb-4" style="color: #0f172a;">Celkem k platbě</h5>
 
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Produkty:</span>
-                    <span>{{ total }} Kč</span>
-                </div>
-
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Doprava:</span>
-                    <span class="text-success">Zdarma</span>
+                <div class="checkout-summary mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Mezisoučet:</span>
+                        <div class="text-end">
+                            <strong>{{ total }}</strong> <span>Kč</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Doprava:</span>
+                        <div class="text-end">
+                            <strong class="text-success">0</strong> <span>Kč</span>
+                        </div>
+                    </div>
                 </div>
 
                 <hr>
 
-                <div class="d-flex justify-content-between mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <strong style="font-size: 1.3rem;">Celkem:</strong>
-                    <strong style="font-size: 1.3rem; color: #f97316;">{{ total }} Kč</strong>
+                    <div class="text-end">
+                        <strong style="font-size: 1.3rem; color: #f97316;">{{ total }}</strong> <strong style="font-size: 1.3rem;">Kč</strong>
+                    </div>
                 </div>
 
                 <button type="button" class="btn btn-modern btn-modern-primary w-100 py-3 mb-2" id="submitOrder">
@@ -131,6 +139,12 @@
 
 {% block extra_js %}
 <script>
+// Filter phone input - allow only numbers, + and spaces
+document.getElementById('phone').addEventListener('input', function(e) {
+    // Remove any characters that are not numbers, +, or spaces
+    this.value = this.value.replace(/[^0-9+\s]/g, '');
+});
+
 document.getElementById('submitOrder').addEventListener('click', function() {
     const form = document.getElementById('checkoutForm');
 
@@ -146,8 +160,17 @@ document.getElementById('submitOrder').addEventListener('click', function() {
     btn.disabled = true;
     btnText.innerHTML = 'Zpracovávám<span class="spinner-modern"></span>';
 
+    // Collect form data
+    const formData = new FormData();
+    formData.append('customer_name', document.getElementById('customer_name').value);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('delivery_address', document.getElementById('delivery_address').value);
+    formData.append('phone', document.getElementById('phone').value);
+    formData.append('note', document.getElementById('note').value);
+
     fetch('?page=checkout', {
-        method: 'POST'
+        method: 'POST',
+        body: formData
     })
     .then(response => response.json())
     .then(data => {

@@ -21,7 +21,7 @@
 <body>
 
     {# Navigační lišta - vždy viditelná #}
-    <nav class="navbar navbar-expand-lg navbar-modern sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-modern sticky-top mb-4">
         <div class="container">
             <a class="navbar-brand" href="?page=home">
                 <i class="bi bi-cup-hot-fill" style="color: #f97316;"></i> <span style="color: #0f172a;">Délicious</span>
@@ -50,7 +50,7 @@
                         </a>
                     </li>
                     {% endif %}
-                    {% if session.role is defined and session.role == 'konzument' %}
+                    {% if session.role is defined and (session.role == 'konzument' or session.role == 'admin') %}
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="?page=cart">
                             <i class="bi bi-cart-fill"></i> Košík
@@ -60,7 +60,7 @@
                         </a>
                     </li>
                     {% endif %}
-                    {% if session.user_id is defined and (session.role == 'konzument' or session.role == 'dodavatel') %}
+                    {% if session.user_id is defined and (session.role == 'konzument' or session.role == 'dodavatel' or session.role == 'admin') %}
                     <li class="nav-item">
                         <a class="nav-link" href="?page=orders">
                             <i class="bi bi-bag-check-fill"></i> Objednávky
@@ -101,7 +101,7 @@
     </nav>
 
     {# Hlavní obsah stránky - každá šablona si ho naplní po svém #}
-    <main class="container mt-4 mb-4">
+    <main class="container mb-4">
         {% block content %}{% endblock %}
     </main>
 

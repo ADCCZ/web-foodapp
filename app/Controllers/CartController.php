@@ -1,14 +1,11 @@
 <?php
 
-require_once '../app/Models/Database.php';
-require_once '../app/Models/Product.php';
-require_once '../app/Helpers/TwigHelper.php';
+namespace App\Controllers;
 
-/**
- * CartController
- * Manages shopping cart functionality with AJAX support
- * Cart is stored in session
- */
+use App\Models\Database;
+use App\Models\Product;
+use App\Helpers\TwigHelper;
+
 class CartController {
     private $productModel;
     private $twig;
@@ -49,10 +46,10 @@ class CartController {
             exit;
         }
 
-        // Check if user is customer
-        if ($_SESSION['role'] !== 'konzument') {
+        // Check if user is customer or admin (suppliers cannot buy)
+        if (!in_array($_SESSION['role'], ['konzument', 'admin'])) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Pouze zákazníci mohou přidávat produkty do košíku']);
+            echo json_encode(['success' => false, 'message' => 'Pouze zákazníci a administrátoři mohou přidávat produkty do košíku']);
             exit;
         }
 
@@ -76,6 +73,24 @@ class CartController {
         // Initialize cart if not exists
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
+        }
+
+        // Check if cart has products from different supplier
+        if (!empty($_SESSION['cart'])) {
+            // Get first product in cart to check supplier
+            $firstProductId = array_key_first($_SESSION['cart']);
+            $firstProduct = $this->productModel->getProductById($firstProductId);
+
+            if ($firstProduct && $firstProduct['supplier_id'] != $product['supplier_id']) {
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Nemůžete objednávat z více restaurací najednou. Vyprázdněte košík a zkuste to znovu.',
+                    'different_supplier' => true,
+                    'current_supplier' => $firstProduct['supplier_name']
+                ]);
+                exit;
+            }
         }
 
         // Add or update quantity

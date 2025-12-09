@@ -25,6 +25,7 @@ CREATE TABLE `users` (
   `jmeno` varchar(100) NOT NULL,
   `role` enum('konzument','dodavatel','admin') NOT NULL DEFAULT 'konzument',
   `is_approved` tinyint(1) NOT NULL DEFAULT 0,
+  `is_super_admin` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `email` (`email`),
@@ -58,6 +59,11 @@ DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL AUTO_INCREMENT,
   `customer_id` int(11) NOT NULL,
+  `customer_name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `delivery_address` text NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `note` text,
   `status` enum('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending',
   `total_price` decimal(10,2) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -94,47 +100,48 @@ CREATE TABLE `order_items` (
 -- ----------------------------------------
 -- Bcrypt hash pro "heslo123": $2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi
 
-INSERT INTO `users` (`user_id`, `email`, `password`, `jmeno`, `role`, `is_approved`, `created_at`) VALUES
-(1, 'admin@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Administrátor Systému', 'admin', 1, NOW()),
-(2, 'dodavatel@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Pizza House', 'dodavatel', 1, NOW()),
-(3, 'dodavatel2@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Burger King', 'dodavatel', 1, NOW()),
-(4, 'dodavatel3@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Sushi Bar', 'dodavatel', 0, NOW()),
-(5, 'zakaznik@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Jan Novák', 'konzument', 1, NOW()),
-(6, 'zakaznik2@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Marie Svobodová', 'konzument', 1, NOW());
+INSERT INTO `users` (`user_id`, `email`, `password`, `jmeno`, `role`, `is_approved`, `is_super_admin`, `created_at`) VALUES
+(1, 'superadmin@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Super Administrátor', 'admin', 1, 1, NOW()),
+(2, 'admin@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Administrátor Systému', 'admin', 1, 0, NOW()),
+(3, 'dodavatel@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Pizza House', 'dodavatel', 1, 0, NOW()),
+(4, 'dodavatel2@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Burger King', 'dodavatel', 1, 0, NOW()),
+(5, 'dodavatel3@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Sushi Bar', 'dodavatel', 0, 0, NOW()),
+(6, 'zakaznik@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Jan Novák', 'konzument', 1, 0, NOW()),
+(7, 'zakaznik2@test.cz', '$2y$10$7QaWf3USCidc2qcsUx5F4e/2GIXmUA1f9k.Eg8U7OwPW8.nvVjDOi', 'Marie Svobodová', 'konzument', 1, 0, NOW());
 
 -- ----------------------------------------
 -- Produkty
 -- ----------------------------------------
 
 INSERT INTO `products` (`product_id`, `supplier_id`, `name`, `description`, `price`, `image`, `created_at`) VALUES
--- Produkty od Pizza House (user_id=2)
-(1, 2, 'Pizza Margherita', 'Klasická pizza s rajčatovou omáčkou, mozzarellou a čerstvou bazalkou', 159.00, 'pizza_margherita.jpg', NOW()),
-(2, 2, 'Pizza Salámová', 'Pizza s rajčatovou omáčkou, mozzarellou a pikantním salámem', 189.00, 'pizza_salamova.jpg', NOW()),
-(3, 2, 'Pizza Hawai', 'Pizza s rajčatovou omáčkou, mozzarellou, šunkou a ananasem', 179.00, 'pizza_hawai.jpg', NOW()),
-(4, 2, 'Coca-Cola 0.5l', 'Osvěžující nápoj', 39.00, 'coca_cola.jpg', NOW()),
+-- Produkty od Pizza House (user_id=3)
+(1, 3, 'Pizza Margherita', 'Klasická pizza s rajčatovou omáčkou, mozzarellou a čerstvou bazalkou', 159.00, 'pizza_margherita.jpg', NOW()),
+(2, 3, 'Pizza Salámová', 'Pizza s rajčatovou omáčkou, mozzarellou a pikantním salámem', 189.00, 'pizza_salamova.jpg', NOW()),
+(3, 3, 'Pizza Hawai', 'Pizza s rajčatovou omáčkou, mozzarellou, šunkou a ananasem', 179.00, 'pizza_hawai.jpg', NOW()),
+(4, 3, 'Coca-Cola 0.5l', 'Osvěžující nápoj', 39.00, 'coca_cola.jpg', NOW()),
 
--- Produkty od Burger King (user_id=3)
-(5, 3, 'Cheeseburger Classic', 'Hovězí burger s čedarem, kyselou okurkou a omáčkou', 99.00, 'cheeseburger.jpg', NOW()),
-(6, 3, 'Double Bacon Burger', 'Dvojitý burger s beconem a čedarovou omáčkou', 149.00, 'double_bacon.jpg', NOW()),
-(7, 3, 'Crispy Chicken Burger', 'Křupavý kuřecí burger s coleslaw a majonézou', 119.00, 'chicken_burger.jpg', NOW()),
-(8, 3, 'Hranolky velké', 'Zlatavé hranolky', 59.00, 'hranolky.jpg', NOW()),
+-- Produkty od Burger King (user_id=4)
+(5, 4, 'Cheeseburger Classic', 'Hovězí burger s čedarem, kyselou okurkou a omáčkou', 99.00, 'cheeseburger.jpg', NOW()),
+(6, 4, 'Double Bacon Burger', 'Dvojitý burger s beconem a čedarovou omáčkou', 149.00, 'double_bacon.jpg', NOW()),
+(7, 4, 'Crispy Chicken Burger', 'Křupavý kuřecí burger s coleslaw a majonézou', 119.00, 'chicken_burger.jpg', NOW()),
+(8, 4, 'Hranolky velké', 'Zlatavé hranolky', 59.00, 'hranolky.jpg', NOW()),
 
--- Produkty od Sushi Bar (user_id=4, NESCHVALENY dodavatel)
-(9, 4, 'Sushi set 24 ks', 'Mix nigiri a maki rolek', 399.00, 'sushi_set.jpg', NOW()),
-(10, 4, 'California roll', '8 ks California roll s lososem a avokádem', 159.00, 'california_roll.jpg', NOW());
+-- Produkty od Sushi Bar (user_id=5, NESCHVALENY dodavatel)
+(9, 5, 'Sushi set 24 ks', 'Mix nigiri a maki rolek', 399.00, 'sushi_set.jpg', NOW()),
+(10, 5, 'California roll', '8 ks California roll s lososem a avokádem', 159.00, 'california_roll.jpg', NOW());
 
 -- ----------------------------------------
 -- Objednavky
 -- ----------------------------------------
 
-INSERT INTO `orders` (`order_id`, `customer_id`, `status`, `total_price`, `created_at`) VALUES
--- Objednavky Jana Novaka (user_id=5)
-(1, 5, 'completed', 387.00, '2024-11-15 12:30:00'),
-(2, 5, 'processing', 149.00, '2024-11-18 18:45:00'),
+INSERT INTO `orders` (`order_id`, `customer_id`, `customer_name`, `email`, `delivery_address`, `phone`, `note`, `status`, `total_price`, `created_at`) VALUES
+-- Objednavky Jana Novaka (user_id=6)
+(1, 6, 'Jan Novák', 'zakaznik@test.cz', 'Univerzitní 2732/8, 301 00 Plzeň', '+420 606 123 456', 'Prosím zazvonit na byt 42', 'completed', 387.00, '2024-11-15 12:30:00'),
+(2, 6, 'Jan Novák', 'zakaznik@test.cz', 'Univerzitní 2732/8, 301 00 Plzeň', '+420 606 123 456', '', 'processing', 149.00, '2024-11-18 18:45:00'),
 
--- Objednavky Marie Svobodove (user_id=6)
-(3, 6, 'completed', 337.00, '2024-11-16 14:20:00'),
-(4, 6, 'pending', 218.00, '2024-11-19 10:15:00');
+-- Objednavky Marie Svobodove (user_id=7)
+(3, 7, 'Marie Svobodová', 'zakaznik2@test.cz', 'Americká 42, 301 00 Plzeň', '+420 777 987 654', 'Zazvonit na přízemí', 'completed', 337.00, '2024-11-16 14:20:00'),
+(4, 7, 'Marie Svobodová', 'zakaznik2@test.cz', 'Americká 42, 301 00 Plzeň', '+420 777 987 654', '', 'pending', 218.00, '2024-11-19 10:15:00');
 
 -- ----------------------------------------
 -- Polozky objednavek

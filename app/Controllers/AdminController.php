@@ -1,15 +1,13 @@
 <?php
 
-require_once __DIR__ . '/../Models/Database.php';
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Models/Order.php';
-require_once __DIR__ . '/../Models/Product.php';
-require_once __DIR__ . '/../Helpers/TwigHelper.php';
+namespace App\Controllers;
 
-/**
- * AdminController
- * Handles admin operations: user management, supplier approval
- */
+use App\Models\Database;
+use App\Models\User;
+use App\Models\Order;
+use App\Models\Product;
+use App\Helpers\TwigHelper;
+
 class AdminController {
     private $userModel;
     private $orderModel;
@@ -27,8 +25,12 @@ class AdminController {
      * Admin dashboard
      */
     public function index() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        if (!isset($_SESSION['user_id'])) {
             header('Location: ?page=login');
+            exit;
+        }
+        if ($_SESSION['role'] !== 'admin') {
+            header('Location: ?page=home');
             exit;
         }
 
@@ -46,8 +48,12 @@ class AdminController {
      * User management page
      */
     public function users() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        if (!isset($_SESSION['user_id'])) {
             header('Location: ?page=login');
+            exit;
+        }
+        if ($_SESSION['role'] !== 'admin') {
+            header('Location: ?page=home');
             exit;
         }
 
@@ -105,6 +111,7 @@ class AdminController {
 
     /**
      * Update user role (AJAX)
+     * SuperAdmin protection: Only SuperAdmin can create/modify admins
      */
     public function updateRole() {
         header('Content-Type: application/json');
@@ -116,6 +123,25 @@ class AdminController {
 
         $userId = (int)$_POST['user_id'];
         $role = $_POST['role'];
+
+        // Check if target user is SuperAdmin
+        $targetUser = $this->userModel->getUserById($userId);
+        if ($targetUser && $targetUser['is_super_admin'] == 1) {
+            echo json_encode(['success' => false, 'message' => 'Nelze upravit SuperAdmina']);
+            exit;
+        }
+
+        // Check if trying to create admin and current user is not SuperAdmin
+        if ($role === 'admin' && !$this->userModel->isSuperAdmin($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Pouze SuperAdmin může vytvářet další administrátory']);
+            exit;
+        }
+
+        // Prevent user from changing own role
+        if ($userId === $_SESSION['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'Nemůžete změnit svou vlastní roli']);
+            exit;
+        }
 
         $success = $this->userModel->updateUserRole($userId, $role);
 
@@ -129,6 +155,7 @@ class AdminController {
 
     /**
      * Delete user (AJAX)
+     * SuperAdmin protection: SuperAdmin cannot be deleted by anyone
      */
     public function deleteUser() {
         header('Content-Type: application/json');
@@ -140,8 +167,22 @@ class AdminController {
 
         $userId = (int)$_POST['user_id'];
 
+        // Prevent deleting yourself
         if ($userId === $_SESSION['user_id']) {
             echo json_encode(['success' => false, 'message' => 'Nemůžete smazat sami sebe']);
+            exit;
+        }
+
+        // Check if target user is SuperAdmin
+        $targetUser = $this->userModel->getUserById($userId);
+        if ($targetUser && $targetUser['is_super_admin'] == 1) {
+            echo json_encode(['success' => false, 'message' => 'SuperAdmin nemůže být smazán']);
+            exit;
+        }
+
+        // Check if target is admin and current user is not SuperAdmin
+        if ($targetUser && $targetUser['role'] === 'admin' && !$this->userModel->isSuperAdmin($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Pouze SuperAdmin může mazat další administrátory']);
             exit;
         }
 
@@ -159,8 +200,12 @@ class AdminController {
      * All orders overview
      */
     public function allOrders() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        if (!isset($_SESSION['user_id'])) {
             header('Location: ?page=login');
+            exit;
+        }
+        if ($_SESSION['role'] !== 'admin') {
+            header('Location: ?page=home');
             exit;
         }
 
@@ -176,8 +221,12 @@ class AdminController {
      * All products overview
      */
     public function allProducts() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        if (!isset($_SESSION['user_id'])) {
             header('Location: ?page=login');
+            exit;
+        }
+        if ($_SESSION['role'] !== 'admin') {
+            header('Location: ?page=home');
             exit;
         }
 

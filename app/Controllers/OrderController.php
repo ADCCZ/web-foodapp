@@ -1,14 +1,12 @@
 <?php
 
-require_once '../app/Models/Database.php';
-require_once '../app/Models/Order.php';
-require_once '../app/Models/Product.php';
-require_once '../app/Helpers/TwigHelper.php';
+namespace App\Controllers;
 
-/**
- * OrderController
- * Manages order creation and order history
- */
+use App\Models\Database;
+use App\Models\Order;
+use App\Models\Product;
+use App\Helpers\TwigHelper;
+
 class OrderController {
     private $orderModel;
     private $productModel;
@@ -24,8 +22,8 @@ class OrderController {
      * Display checkout page
      */
     public function checkout() {
-        // Check if user is logged in
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'konzument') {
+        // Check if user is logged in as customer or admin
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['konzument', 'admin'])) {
             header('Location: ?page=login');
             exit;
         }
@@ -51,10 +49,10 @@ class OrderController {
      * Process order creation
      */
     public function createOrder() {
-        // Check authentication
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'konzument') {
+        // Check authentication (customer or admin can order)
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['konzument', 'admin'])) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Nejste přihlášeni jako zákazník']);
+            echo json_encode(['success' => false, 'message' => 'Nejste přihlášeni jako zákazník nebo administrátor']);
             exit;
         }
 
@@ -62,6 +60,34 @@ class OrderController {
         if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Košík je prázdný']);
+            exit;
+        }
+
+        // Get delivery information from POST
+        $customerName = $_POST['customer_name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $deliveryAddress = $_POST['delivery_address'] ?? '';
+        $phone = $_POST['phone'] ?? '';
+        $note = $_POST['note'] ?? '';
+
+        // Validate required fields
+        if (empty($customerName) || empty($email) || empty($deliveryAddress) || empty($phone)) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Vyplňte všechny povinné údaje']);
+            exit;
+        }
+
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Neplatný formát emailu']);
+            exit;
+        }
+
+        // Validate note length (max 500 characters)
+        if (strlen($note) > 500) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Poznámka může mít maximálně 500 znaků']);
             exit;
         }
 
@@ -78,8 +104,17 @@ class OrderController {
             ];
         }
 
-        // Create order
-        $orderId = $this->orderModel->createOrder($_SESSION['user_id'], $orderItems, $total);
+        // Create order with delivery information
+        $orderId = $this->orderModel->createOrder(
+            $_SESSION['user_id'],
+            $orderItems,
+            $total,
+            $customerName,
+            $email,
+            $deliveryAddress,
+            $phone,
+            $note
+        );
 
         if ($orderId) {
             // Clear cart
@@ -113,11 +148,11 @@ class OrderController {
 
         $orders = [];
 
-        if ($_SESSION['role'] === 'konzument') {
-            // Customer orders
+        if (in_array($_SESSION['role'], ['konzument', 'admin'])) {
+            // Customer/Admin orders - show only their own orders
             $orders = $this->orderModel->getOrdersByUserId($_SESSION['user_id']);
         } elseif ($_SESSION['role'] === 'dodavatel') {
-            // Supplier orders
+            // Supplier orders - show orders containing their products
             $orders = $this->orderModel->getOrdersBySupplierId($_SESSION['user_id']);
         }
 
@@ -151,6 +186,7 @@ class OrderController {
         }
 
         // Verify user can view this order
+        // Customers can only view their own orders, Admin can view all orders
         if ($_SESSION['role'] === 'konzument' && $order['customer_id'] != $_SESSION['user_id']) {
             header('Location: ?page=orders');
             exit;

@@ -3,6 +3,67 @@
 
 {% block title %}Registrace - Délicious{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Role selection cards */
+.role-card {
+    border: 2px solid #cbd5e1;
+    color: #0f172a;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.role-card:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.role-card-customer {
+    border-color: #fed7aa;
+}
+
+.role-card-customer:hover {
+    border-color: #f97316;
+    background: #fff7ed;
+}
+
+.role-card-supplier {
+    border-color: #bfdbfe;
+}
+
+.role-card-supplier:hover {
+    border-color: #1e40af;
+    background: #eff6ff;
+}
+
+/* Checked state */
+.btn-check:checked + .role-card-customer {
+    border-color: #f97316;
+    background: #fff7ed;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.btn-check:checked + .role-card-supplier {
+    border-color: #1e40af;
+    background: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.role-card .icon-customer {
+    color: #f97316;
+}
+
+.role-card .icon-supplier {
+    color: #1e40af;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 200px);">
     <div class="col-11 col-md-8 col-lg-6">
@@ -26,8 +87,8 @@
                         <label for="jmeno" class="form-label form-label-modern">
                             <i class="bi bi-person-fill me-1"></i> Jméno a příjmení
                         </label>
-                        <input type="text" class="form-control form-control-modern" id="jmeno" name="jmeno" required
-                               placeholder="Jan Novák">
+                        <input type="text" class="form-control form-control-modern" id="jmeno" name="jmeno" pattern="[^0-9]*" title="Jméno nesmí obsahovat čísla" required
+                               placeholder="Vaše celé jméno">
                     </div>
 
                     <div class="mb-3">
@@ -61,17 +122,17 @@
                         </label>
                         <div class="row g-3">
                             <div class="col-6">
-                                <input type="radio" class="btn-check" name="role" id="role_konzument" value="konzument" checked>
-                                <label class="btn w-100" for="role_konzument" style="border: 2px solid #f97316; color: #0f172a; border-radius: 8px; padding: 1rem;">
-                                    <i class="bi bi-person-fill d-block fs-3 mb-2" style="color: #f97316;"></i>
+                                <input type="radio" class="btn-check" name="role" id="role_konzument" value="konzument" checked required>
+                                <label class="btn w-100 role-card role-card-customer" for="role_konzument">
+                                    <i class="bi bi-person-fill icon-customer d-block fs-3 mb-2"></i>
                                     <strong>Zákazník</strong><br>
                                     <small>Chci objednávat</small>
                                 </label>
                             </div>
                             <div class="col-6">
-                                <input type="radio" class="btn-check" name="role" id="role_dodavatel" value="dodavatel">
-                                <label class="btn w-100" for="role_dodavatel" style="border: 2px solid #1e40af; color: #0f172a; border-radius: 8px; padding: 1rem;">
-                                    <i class="bi bi-shop d-block fs-3 mb-2" style="color: #1e40af;"></i>
+                                <input type="radio" class="btn-check" name="role" id="role_dodavatel" value="dodavatel" required>
+                                <label class="btn w-100 role-card role-card-supplier" for="role_dodavatel">
+                                    <i class="bi bi-shop icon-supplier d-block fs-3 mb-2"></i>
                                     <strong>Dodavatel</strong><br>
                                     <small>Chci prodávat</small>
                                 </label>
@@ -103,6 +164,12 @@
 
 {% block extra_js %}
 <script>
+// Filter name input - remove numbers
+document.getElementById('jmeno').addEventListener('input', function(e) {
+    // Remove any numbers from the input
+    this.value = this.value.replace(/[0-9]/g, '');
+});
+
 document.getElementById('registerForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -151,7 +218,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
             alertBox.classList.add('alert-danger');
             alertBox.classList.remove('d-none');
             btn.disabled = false;
-            btnText.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Zaregistrovat se';
+            btnText.textContent = 'Zaregistrovat se';
         }
     })
     .catch(error => {
@@ -159,7 +226,7 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         alertMessage.textContent = "Chyba komunikace se serverem. Zkontrolujte konzoli (F12).";
         alertBox.classList.remove('d-none');
         btn.disabled = false;
-        btnText.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Zaregistrovat se';
+        btnText.textContent = 'Zaregistrovat se';
     });
 });
 </script>

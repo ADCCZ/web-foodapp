@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Models;
+
+use PDO;
+
 /**
  * User Model
  * Handles database operations for user management
@@ -16,9 +20,9 @@ class User {
      * @return array All users
      */
     public function getAllUsers() {
-        $sql = "SELECT user_id, jmeno, email, role, is_approved, created_at
+        $sql = "SELECT user_id, jmeno, email, role, is_approved, is_super_admin, created_at
                 FROM users
-                ORDER BY created_at DESC";
+                ORDER BY user_id ASC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -44,12 +48,25 @@ class User {
      * @return array|false User data or false
      */
     public function getUserById($userId) {
-        $sql = "SELECT user_id, jmeno, email, role, is_approved, created_at
+        $sql = "SELECT user_id, jmeno, email, role, is_approved, is_super_admin, created_at
                 FROM users
                 WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':user_id' => $userId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Check if user is SuperAdmin
+     * @param int $userId
+     * @return bool True if SuperAdmin
+     */
+    public function isSuperAdmin($userId) {
+        $sql = "SELECT is_super_admin FROM users WHERE user_id = :user_id AND role = 'admin'";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':user_id' => $userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result && $result['is_super_admin'] == 1;
     }
 
     /**

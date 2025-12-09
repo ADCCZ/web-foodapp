@@ -1,13 +1,11 @@
 <?php
 
-require_once '../app/Models/Database.php';
-require_once '../app/Models/Product.php';
-require_once '../app/Helpers/TwigHelper.php';
+namespace App\Controllers;
 
-/**
- * SupplierController
- * Handles supplier product management (add, edit, delete products)
- */
+use App\Models\Database;
+use App\Models\Product;
+use App\Helpers\TwigHelper;
+
 class SupplierController {
     private $productModel;
     private $twig;
@@ -74,6 +72,14 @@ class SupplierController {
         $name = trim($_POST['name']);
         $description = trim($_POST['description']);
         $price = floatval($_POST['price']);
+
+        // Validate description length (max 500 characters)
+        if (strlen($description) > 500) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Popis může mít maximálně 500 znaků']);
+            exit;
+        }
+
         $imageName = null;
 
         // Handle image upload
@@ -151,10 +157,10 @@ class SupplierController {
      * Allows supplier to edit their product details and optionally upload new image
      */
     public function updateProduct() {
-        // Check authentication
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'dodavatel') {
+        // Check authentication (allow supplier and admin)
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['dodavatel', 'admin'])) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Nejste přihlášen jako dodavatel']);
+            echo json_encode(['success' => false, 'message' => 'Nejste přihlášen jako dodavatel nebo administrátor']);
             exit;
         }
 
@@ -170,10 +176,24 @@ class SupplierController {
         $description = trim($_POST['description']);
         $price = floatval($_POST['price']);
 
-        // Verify product belongs to this supplier
+        // Validate description length (max 500 characters)
+        if (strlen($description) > 500) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Popis může mít maximálně 500 znaků']);
+            exit;
+        }
+
+        // Verify product belongs to this supplier (admin can edit all products)
         $product = $this->productModel->getProductById($productId);
 
-        if (!$product || $product['supplier_id'] != $_SESSION['user_id']) {
+        if (!$product) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Produkt nebyl nalezen']);
+            exit;
+        }
+
+        // Check if user can edit this product (own product or is admin)
+        if ($_SESSION['role'] !== 'admin' && $product['supplier_id'] != $_SESSION['user_id']) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Nemáte oprávnění upravit tento produkt']);
             exit;
@@ -220,13 +240,13 @@ class SupplierController {
     }
 
     /**
-     * Delete product (only supplier's own products)
+     * Delete product (only supplier's own products or admin can delete all)
      */
     public function deleteProduct() {
-        // Check authentication
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'dodavatel') {
+        // Check authentication (allow supplier and admin)
+        if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['dodavatel', 'admin'])) {
             header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Nejste přihlášen jako dodavatel']);
+            echo json_encode(['success' => false, 'message' => 'Nejste přihlášen jako dodavatel nebo administrátor']);
             exit;
         }
 
@@ -238,10 +258,17 @@ class SupplierController {
 
         $productId = (int)$_POST['product_id'];
 
-        // Verify product belongs to this supplier
+        // Verify product belongs to this supplier (admin can delete all products)
         $product = $this->productModel->getProductById($productId);
 
-        if (!$product || $product['supplier_id'] != $_SESSION['user_id']) {
+        if (!$product) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Produkt nebyl nalezen']);
+            exit;
+        }
+
+        // Check if user can delete this product (own product or is admin)
+        if ($_SESSION['role'] !== 'admin' && $product['supplier_id'] != $_SESSION['user_id']) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Nemáte oprávnění smazat tento produkt']);
             exit;
