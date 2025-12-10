@@ -13,7 +13,7 @@ Moderní webová aplikace pro objednávání a rozvoz jídla s elegantním desig
 
 ## Technologie
 
-- **Backend:** PHP 8.2+ (OOP, MVC architektura)
+- **Backend:** PHP 8.2.12 (OOP, MVC architektura)
 - **Frontend:** HTML5, CSS3, Bootstrap 5, JavaScript (AJAX)
 - **Template Engine:** Twig 3
 - **Databáze:** MySQL (přístup přes PDO)
@@ -21,6 +21,7 @@ Moderní webová aplikace pro objednávání a rozvoz jídla s elegantním desig
 - **Webserver:** Apache (XAMPP)
 
 ## Funkce
+
 
 - **Moderní minimalistický design** - Čisté pozadí, kontrastní barvy, elegantní layout
 - **Responzivní rozhraní** - Bootstrap 5 + vlastní CSS, optimalizováno pro mobil i PC

@@ -74,7 +74,13 @@
                         <li class="nav-item">
                             <span class="navbar-text me-3" style="color: #1e293b;">
                                 <i class="bi bi-person-circle" style="color: #f97316;"></i> <strong>{{ session.jmeno }}</strong>
-                                <span class="badge" style="background: #f97316;">{{ session.role }}</span>
+                                <span class="badge" style="background: #f97316;">
+                                    {% if session.is_super_admin is defined and session.is_super_admin == 1 %}
+                                        superadmin
+                                    {% else %}
+                                        {{ session.role }}
+                                    {% endif %}
+                                </span>
                             </span>
                         </li>
                         <li class="nav-item">
