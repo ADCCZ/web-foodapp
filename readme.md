@@ -343,7 +343,7 @@ rm -rf app/Views/cache/*
 
 **Projekt:** Semestrální práce - Webové aplikace (KIV/WEB)
 **Název aplikace:** Délicious
-**Autor:** Oldřich Daš
+**Autor:** Oldřich Jan Švehla
 **Email:** oldasvehla@seznam.cz
 **Datum vytvoření:** 9. prosince 2025
 
